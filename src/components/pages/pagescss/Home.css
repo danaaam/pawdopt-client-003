@@ -1,0 +1,162 @@
+.home-container{
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 0.03fr 0.01fr 0.02fr 0.05fr;
+    grid-template-areas:
+      "adoptafriend"
+      "hoomanfriend"
+      "main"
+      "context"
+      "friendbutton";
+      background-color: #6dbb48;
+}
+.bg-home {
+    grid-area: main;
+    position: relative;
+    background-color: #6dbb48;
+    background-size: cover;
+}
+.adopt-friend{
+    grid-area: adoptafriend;
+    background-color: #6dbb48;
+}
+.adopt-friend h1{
+    text-align: center;
+    display: block;
+    margin: 0 auto;
+    padding: 10px;
+    color: white;
+    font-size: 40px;
+    padding: 20px;
+}
+.human-friend {
+    grid-area: hoomanfriend;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #6dbb48;
+    width: 100%;
+    height: 300px;
+    margin: 0 auto;
+}
+.human-friend img {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    height: 60%;
+    width: auto;
+    padding: 20px;
+}
+.text-container {
+    text-align: center;
+    margin-right: 10px;
+    padding: 20px;
+    width: 50%;
+}
+.text-container h3{
+    font-size: 25px;
+    color: black;
+}
+.text-container p{
+  font-size: 20px;
+  color: black;
+  font-weight: bold;
+}
+.text-section {
+    grid-area: context;
+    text-align: center;
+    width: auto;
+    border: 10px solid #b0dc9b;
+    padding: 10px;
+    margin: 20px;
+    background-color: white;
+}
+
+.text-section h1 {
+    font-size: 40px;
+    text-align: center; 
+    padding: 10px;
+    color: black;
+}
+
+.text-section p {
+    text-align: center; 
+    padding: 10px;
+    font-size: 25px;
+    font-weight: 500;
+    color: black;
+}  
+.image-grid {
+    grid-area: friendbutton;
+    background-color: #6dbb48;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px;
+  }
+  
+  .text {
+    text-align: center;
+  }
+  .text h1{
+    font-size: 30px;
+    color: black;
+  }
+  .friend-button {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+  }
+  
+  .friend-button button {
+    border: none;
+    background: none;
+    padding: 10px;
+    cursor: pointer;
+  }
+  
+  .friend-button img {
+    max-width: 100%;
+    max-height: 100%;
+    border: none;
+  } 
+
+  @media (max-width: 768px) {
+    .home-container {
+      grid-template-rows: 0.05fr 0.01fr 0.02fr auto;
+    }
+  
+    .human-friend {
+      display: flex;
+      flex-direction: column;
+      align-items: center; 
+      text-align: center;
+    }
+  
+    .human-friend img {
+      margin: 0; 
+    }
+  
+    .text-container {
+      margin: 0; 
+      
+    }
+    .adopt-friend h1 {
+        font-size: 30px;
+      }
+      .text-section h1 {
+        font-size: 30px;
+        text-align: center; 
+        padding: 10px;
+        color: black;
+    }
+    
+    .text-section p {
+        text-align: center; 
+        padding: 10px;
+        font-size: 20px;
+        font-weight: 500;
+        color: black;
+    } 
+    
+  }

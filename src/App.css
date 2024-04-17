@@ -1,0 +1,11 @@
+
+.grid-container{
+  display: grid;
+  height: 100vh;
+  grid-template-columns: 5fr;
+  grid-template-rows: 0fr 3fr auto;
+  grid-template-areas: 
+  "header"
+  "main"
+  "footer"
+}

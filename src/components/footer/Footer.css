@@ -1,0 +1,50 @@
+.footer {
+  background-color: #1aac83;
+  color: white;
+  padding: 10px 0; /* Reduce padding for smaller size */
+  text-align: center;
+}
+
+.footer-content {
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+}
+
+.service-info,
+.store-hours,
+.donation-section {
+  flex: 1 1 250px; /* Reduce flex basis for smaller size */
+  margin: 5px; /* Reduce margin for smaller size */
+}
+
+.store-hours a {
+  color: white;
+}
+
+.footer p,
+.footer h2 {
+  margin: 5px 0;
+  margin-bottom: 8px; /* Reduce margin bottom for smaller size */
+  font-weight: bold;
+  font-size: 14px; /* Reduce font size for smaller size */
+}
+
+.icon-about-us,
+.icon-help {
+  vertical-align: middle;
+  margin-right: 5px; /* Reduce margin right for smaller size */
+  font-size: 18px; /* Reduce font size for smaller size */
+}
+
+@media screen and (max-width: 768px) {
+  .footer-content {
+    flex-direction: column; /* Change to column layout for smaller screens */
+  }
+
+  .service-info,
+  .store-hours,
+  .donation-section {
+    flex-basis: 100%; /* Set flex basis to 100% to make them stack vertically */
+  }
+}

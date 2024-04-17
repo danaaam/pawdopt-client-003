@@ -1,0 +1,179 @@
+.about-us {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 0.05fr 0.05fr 0.2fr 0.1fr 0.1fr 0.2fr;
+  grid-template-areas:
+    "main"
+    "about"
+    "vmission"
+    "more"
+    "staff"
+    "contributors";
+  background-color: #b0dc9b;
+}
+.bg-image-home {
+  grid-area: main;
+}
+.bg-image-home img{
+  width: 100%;
+  height: 400px;
+}
+.about-us-container {
+  grid-area: about;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+}
+
+.about-us-container h1 {
+  margin-bottom: 20px;
+  text-align: center;
+  color: black;
+  font-size: 50px;
+}
+.about-us-container p {
+  text-align: center;
+  font-size: 30px;
+  font-size: 500;
+  color: black;
+}
+.content {
+  grid-area: vmission;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  gap: 20px;
+}
+.content .vision p,
+.content .mission p {
+  font-size: 30px;
+  padding: 10px;
+  text-align: center;
+}
+.mission,
+.vision {
+  background-color: #88c86a;
+  text-align: center;
+  margin: 10px;
+  border-radius: 10px;
+  padding: 10px;
+  height: auto;
+  width: auto;
+}
+.mission h1,
+.vision h1 {
+  font-size: 50px;
+}
+.learn-more {
+  grid-area: more;
+  margin-left: 20px;
+  padding: 10px;
+}
+
+.learn-more h3 {
+  margin-bottom: 10px;
+  font-size: 30px;
+}
+
+.learn-more h3 a {
+  text-decoration: none;
+  color: #0078d4;
+}
+.staff{
+  grid-area: staff;
+  text-align: center;
+  background-color: #6dbb48;
+}
+.staff h1{
+  font-size: 50px;
+  color: hsl(0, 0%, 100%);
+}
+.contributors {
+  grid-area: contributors;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  text-align: center;
+  justify-content: center;
+  background-color: #6dbb48;
+  gap: 5%;
+  padding: 20px;
+}
+.al,
+.dana,
+.andrei,
+.kc{
+  padding: 10px;
+}
+.al p,
+.dana p,
+.andrei p,
+.kc p{
+  font-size: 30px;
+  color: black;
+}
+.al h2,
+.dana h2,
+.andrei h2,
+.kc h2{
+  text-align: center;
+  font-size: 30px;
+  color: black;
+}
+@media screen and (max-width: 768px) {
+  .about-us {
+    grid-template-rows: 0.1fr 0.1fr 0.3fr 0.1fr 0.1fr 0.1fr;
+  }
+
+  .about-us-container h1 {
+    font-size: 30px;
+  }
+  .about-us-container p {
+    font-size: 20px;
+  }
+  .content .vision p,
+  .content .mission p {
+    font-size: 20px;
+  }
+  .mission,
+  .vision {
+    padding: 5px;
+  }
+  .mission h1,
+  .vision h1 {
+    font-size: 30px;
+  }
+  .learn-more {
+    margin-left: 10px;
+  }
+  .learn-more h3 {
+    font-size: 20px;
+  }
+  .contributors {
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+  .al,
+  .dana,
+  .andrei,
+  .kc {
+    padding: 5px;
+  }
+  .al h2,
+  .dana h2,
+  .andrei h2,
+  .kc h2 {
+    font-size: 20px;
+  }
+  .al p,
+  .dana p,
+  .andrei p,
+  .kc p {
+    font-size: 20px;
+  }
+}

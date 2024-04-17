@@ -1,0 +1,90 @@
+.how-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    background-color: white;
+    padding: 10px;
+  }
+  .how{
+    margin: 50px auto;
+  }
+  .how h1 {
+    margin-top: 50px;
+    font-size: 50px;
+    color: black;
+  }
+  
+  .paragraph {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+  }
+  
+  .paragraph h2,
+  .paragraphlast h2 {
+    font-size: 40px;
+    color: #7fc35e;
+  }
+  
+  .paragraph p {
+    font-size: 30px;
+    color: black;
+    font-weight: bold;
+  }
+  .paragraphlast{
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+  }
+  .paragraphlast p {
+    font-size:     25px;
+    text-align: left;
+    margin-left: 20px;
+    display: flex;
+    align-items: center; 
+    color: rgb(5, 83, 44);
+    font-weight: bold;
+  }
+  .paragraphlast p:nth-last-child(-n+3) {
+    color: #FF0000; /* Change this to the desired color code */
+  }
+  
+  .paragraphlast .icon {
+    margin-right: 10px; 
+  }
+  
+  @media screen and (max-width: 768px) {
+    .how{
+      margin: 50px auto;
+    }
+    .how h1 {
+      font-size: 32px;
+      font-weight: 500;
+    }
+  
+    .paragraph h2,
+    .paragraphlast h2 {
+      font-size: 30px;
+      font-weight: bolder;
+    }
+  
+    .paragraph p {
+      font-size: 16px;
+      font-weight: 700;
+    }
+  
+    .paragraphlast {
+      font-size: 14px;
+      text-align: left; 
+      margin-left: 20px;
+      font-weight: 300;
+    }
+  }
+  

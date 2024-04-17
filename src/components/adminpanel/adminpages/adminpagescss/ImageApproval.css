@@ -1,0 +1,8 @@
+img {
+    width: 200px; /* Adjust the width as needed */
+    height: auto; /* Maintain aspect ratio */
+
+    /* Optionally, consider these techniques for responsive and adaptive resizing: */
+    /* max-width: 100%; */
+    object-fit: cover; /* Or contain, fill, etc. based on your desired behavior */
+}
