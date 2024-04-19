@@ -150,7 +150,7 @@ function FriendNeedsHome() {
         <br />
         
         <div className="flex items-center justify-center font-semibold text-xl">
-          <h1>Available to Adopt</h1>
+          <h1>Available Pets for Adoption</h1>
         </div>
         <div className="gallery-container">
         <div className="flex justify-end mb-4">
@@ -159,8 +159,8 @@ function FriendNeedsHome() {
           className="px-2 border-solid rounded-2xl py-3 font-semibold hover:bg-green-500 hover:text-white"
         >
           {isFormVisible
-            ? "Hide Pet adoption advocate"
-            : "Pet adoption advocate"}
+            ? "Hide Pet Adoption Gallery Form"
+            : "Pet Adoption Gallery Form"}
         </button>
         </div>
         {isFormVisible && (
@@ -183,7 +183,7 @@ function FriendNeedsHome() {
                   <div className="sm:flex sm:items-start">
                     <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
                       <h3 className="text-lg leading-6 font-medium text-gray-900">
-                        Pet Advocate Form
+                        Pet Adoption Gallery Form
                       </h3>
                       <div className="mt-2">
                         <label className="form-group-label">

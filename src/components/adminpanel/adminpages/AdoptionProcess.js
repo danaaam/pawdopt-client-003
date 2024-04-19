@@ -79,10 +79,23 @@ function AdoptionProcess() {
       toast.warning("Declined");
       window.location.reload();
     } catch (error) {
-      console.error("Error updating adoption request:", error);
+      console.error("Error updating adoption request", error);
     }
   };
-  
+
+  const handleDeleteAdoptionRequest = async (id) => {
+    console.log("Deleting adoption request with id:", id);
+    try {
+      await axios.delete(`http://localhost:8000/api/adoption/request/delete/${id}`);
+      console.log("Adoption request deleted successfully");
+      // Filter out the deleted request from the state
+      setAdoptionRequests(adoptionrequests.filter(request => request._id !== id));
+      toast.success("Adoption request deleted successfully");
+    } catch (error) {
+      console.error("Error deleting adoption request", error);
+      toast.error("Failed to delete adoption request");
+    }
+  };
   
 
   return (
@@ -144,6 +157,14 @@ function AdoptionProcess() {
                       className="ml-2 px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 focus:outline-none focus:bg-red-600"
                     >
                       Decline
+                    </button>
+                  </div>
+                  <div className="flex mt-2">
+                  <button
+                      onClick={() => handleDeleteAdoptionRequest(item._id)}
+                      className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 focus:outline-none focus:bg-red-600 mr-2 mb-2"
+                    >
+                      Delete
                     </button>
                   </div>
                 </div>

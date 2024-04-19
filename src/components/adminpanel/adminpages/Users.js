@@ -66,7 +66,7 @@ function Users() {
         password: "",
         verified: false,
         role: "",
-        admimMessage: ""
+        adminMessage: ""
       });
       fetchUsers();
       // Alert message when edit is successful
@@ -229,11 +229,6 @@ function Users() {
                         <option value="false">Unverify</option>
                         <option value="true">Verify</option>
                       </select>
-                      <input
-                        type="text"
-                        placeholder="Enter message"
-                        className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-indigo-200"
-                      />
                     </div>
                   ) : (
                     <span>{user.verified ? "Verified" : "Not Verified"}</span>
