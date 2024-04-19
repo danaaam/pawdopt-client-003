@@ -130,8 +130,8 @@ function FriendNeedsHome() {
     }
   };
 
-  const openModal = (imageUrl) => {
-    setSelectedImage({ imageUrl });
+  const openModal = (imageUrls) => {
+    setSelectedImage({ imageUrls });
     setIsModalOpen(true);
 
     document.body.classList.add("modal-open");
@@ -150,7 +150,7 @@ function FriendNeedsHome() {
         <br />
         
         <div className="flex items-center justify-center font-semibold text-xl">
-          <h1>Available Pets for Adoption</h1>
+          <h1>Available to Adopt</h1>
         </div>
         <div className="gallery-container">
         <div className="flex justify-end mb-4">
@@ -159,8 +159,8 @@ function FriendNeedsHome() {
           className="px-2 border-solid rounded-2xl py-3 font-semibold hover:bg-green-500 hover:text-white"
         >
           {isFormVisible
-            ? "Hide Pet Adoption Gallery Form"
-            : "Pet Adoption Gallery Form"}
+            ? "Hide Pet adoption advocate"
+            : "Pet adoption advocate"}
         </button>
         </div>
         {isFormVisible && (
@@ -183,7 +183,7 @@ function FriendNeedsHome() {
                   <div className="sm:flex sm:items-start">
                     <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
                       <h3 className="text-lg leading-6 font-medium text-gray-900">
-                        Pet Adoption Gallery Form
+                        Pet Advocate Form
                       </h3>
                       <div className="mt-2">
                         <label className="form-group-label">
@@ -320,57 +320,56 @@ function FriendNeedsHome() {
       </div>
         <div className="container px-5 py-24 mx-auto">
           <div className="flex flex-wrap -m-4">
-            {usergalleryData.map((group) => (
-              <div key={group._id} className="lg:w-1/4 md:w-1/2 p-4 w-full">
-                <a
-                  className="block relative h-48 rounded overflow-hidden"
-                  onClick={() => openModal(group.imageUrl, group.caption)}
-                >
-                   {group.images.map((group,index) =>
-                    <div key={index}>
-                  <img
-                    alt={group.caption}
-                    className="w-full h-full object-cover"
-                    style={{ width: '200px', height: '200px' }} // Set your desired width and height here
-                    src={`http://localhost:8000/uploads/${group.imageUrl}`}
-                  />
-                  </div>
-                  )}
-                </a>
-                <div className="mt-4">
-                  <div className="information">
-                    <p>
-                      <strong>Posted by:</strong> {group.user_email}
-                    </p>
-                    <p>
-                      <strong>Caption:</strong> {group.images[0].caption}
-                    </p>
-                    <p>
-                      <strong>Species:</strong> {group.images[0].species}
-                    </p>
-                    <p>
-                      <strong>Breed:</strong> {group.images[0].breed}
-                    </p>
-                    <p>
-                      <strong>Gender:</strong> {group.images[0].gender}
-                    </p>
-                    <p>
-                      <strong>Age in months:</strong> {group.images[0].age}
-                    </p>
-                    <p>
-                      <strong>Medical History:</strong>{" "}
-                      {group.images[0].medhistory} {group.images[0].others}
-                    </p>
-                  </div>
+          {usergalleryData.map((group) => (
+  <div key={group._id} className="lg:w-1/4 md:w-1/2 p-4 w-full">
+    <a
+      className="block relative h-48 rounded overflow-hidden"
+      onClick={() => openModal(group.images[0].imageUrls)} // Assuming you want to open modal with the first image URL
+    >
+      {group.images.map((image, index) => (
+        <div key={index}>
+          <img
+            alt={image.caption}
+            className="w-full h-full object-cover"
+            style={{ width: '200px', height: '200px' }} // Set your desired width and height here
+            src={`http://localhost:8000/uploads/${image.imageUrls[0]}`} // Assuming imageUrls is an array of strings
+          />
+        </div>
+      ))}
+    </a>
+    <div className="mt-4">
+      <div className="information">
+        <p>
+          <strong>Posted by:</strong> {group.user_email}
+        </p>
+        <p>
+          <strong>Caption:</strong> {group.images[0].caption}
+        </p>
+        <p>
+          <strong>Species:</strong> {group.images[0].species}
+        </p>
+        <p>
+          <strong>Breed:</strong> {group.images[0].breed}
+        </p>
+        <p>
+          <strong>Gender:</strong> {group.images[0].gender}
+        </p>
+        <p>
+          <strong>Age in months:</strong> {group.images[0].age}
+        </p>
+        <p>
+          <strong>Medical History:</strong> {group.images[0].medhistory} {group.images[0].others}
+        </p>
+      </div>
+      <TalkToTheUser imageUrl={group.images[0].imageUrl} />
+      <h2 className="text-gray-900 title-font text-lg font-medium">
+        {group.caption}
+      </h2>
+      <p className="mt-1">{group.category}</p>
+    </div>
+  </div>
+))}
 
-                  <TalkToTheUser imageUrl={group.images[0].imageUrl} />
-                  <h2 className="text-gray-900 title-font text-lg font-medium">
-                    {group.caption}
-                  </h2>
-                  <p className="mt-1">{group.category}</p>
-                </div>
-              </div>
-            ))}
           </div>
         </div>
       </section>
