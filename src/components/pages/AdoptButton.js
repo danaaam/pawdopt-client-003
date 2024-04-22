@@ -2,12 +2,13 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import './AdoptButton.css'; // Import your custom CSS file for styling
 
-const AdoptButton = ({ imageUrl }) => {
+const AdoptButton = ({ imageUrl, petId }) => {
   const [isAdoptFormVisible, setIsAdoptFormVisible] = useState(false);
   const [name, setName] = useState('');
   const [address, setAddress] = useState('');
-  const [contactinfo, setContactInfo] = useState('');
+  const [contactInfo, setContactInfo] = useState('');
   const [message, setMessage] = useState('');
   const navigate = useNavigate();
 
@@ -15,13 +16,13 @@ const AdoptButton = ({ imageUrl }) => {
     setIsAdoptFormVisible(!isAdoptFormVisible);
   };
 
-  const handleSubmitAdoptionRequest = async (event, imageUrl) => {
+  const handleSubmitAdoptionRequest = async (event) => {
     event.preventDefault();
     try {
       const token = localStorage.getItem('token');
       const verified = localStorage.getItem('verified');
       if (!token) {
-        toast.error("You need to log in first, please log in");
+        toast.error('You need to log in first, please log in');
         navigate('/login');
         return;
       }
@@ -30,13 +31,14 @@ const AdoptButton = ({ imageUrl }) => {
         navigate('/valid');
         return;
       }
-      
+  
       const adoptionData = {
         name,
         address,
-        contactinfo,
+        contactInfo,
         message,
-        imageUrl: imageUrl, 
+        imageUrl,
+        adoptionRequests: [petId], // Include the petId in the adoption request data
       };
   
       const response = await axios.post(
@@ -44,33 +46,36 @@ const AdoptButton = ({ imageUrl }) => {
         adoptionData,
         {
           headers: {
-            Authorization: `Bearer ${token}`
-          }
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
   
       if (response.status === 201) {
-        toast.success("Successfully submitted a request");
+        toast.success('Successfully submitted a request');
+        setIsAdoptFormVisible(false); // Close the modal after successful submission
       } else {
-        console.error("Error submitting adoption request:", response.data.error);
+        console.error('Error submitting adoption request:', response.data.error);
       }
     } catch (error) {
-      console.error("Error submitting adoption request:", error);
+      console.error('Error submitting adoption request:', error);
     }
   };
+  
 
   return (
     <div className="adoption-form">
-      <button onClick={handleAdoptFormVisibility}>Click to adopt</button>
+      <button className="adopt-button" onClick={handleAdoptFormVisibility}>
+        Adopt request
+      </button>
       {isAdoptFormVisible && (
-        <div className="adopt-form-overlay">
-          <div className="adopt-form">
+        <div className="modal-overlay">
+          <div className="modal-content">
             <h2>Adoption Form</h2>
-            <form>
+            <form onSubmit={handleSubmitAdoptionRequest}>
               <div className="form-group">
                 <label htmlFor="name">Name:</label>
                 <input
-                  className="form-group-input"
                   type="text"
                   id="name"
                   value={name}
@@ -81,7 +86,6 @@ const AdoptButton = ({ imageUrl }) => {
               <div className="form-group">
                 <label htmlFor="address">Address:</label>
                 <input
-                  className="form-group-input"
                   type="text"
                   id="address"
                   value={address}
@@ -92,27 +96,34 @@ const AdoptButton = ({ imageUrl }) => {
               <div className="form-group">
                 <label htmlFor="contactInfo">Contact Info:</label>
                 <input
-                  className="form-group-input"
                   type="text"
                   id="contactInfo"
-                  value={contactinfo}
+                  value={contactInfo}
                   onChange={(e) => setContactInfo(e.target.value)}
                   required
                 />
               </div>
               <div className="form-group">
                 <label htmlFor="message">Message:</label>
-                <input
-                  className="form-group-input"
-                  type="text"
+                <textarea
                   id="message"
                   value={message}
                   placeholder="Optional"
                   onChange={(e) => setMessage(e.target.value)}
                 />
               </div>
-              <button onClick={handleSubmitAdoptionRequest}>Submit</button>
-              <button onClick={handleAdoptFormVisibility}>Cancel</button>
+              <div className="button-group">
+                <button type="submit" className="submit-button">
+                  Submit
+                </button>
+                <button
+                  type="button"
+                  className="cancel-button"
+                  onClick={handleAdoptFormVisibility}
+                >
+                  Cancel
+                </button>
+              </div>
             </form>
           </div>
         </div>

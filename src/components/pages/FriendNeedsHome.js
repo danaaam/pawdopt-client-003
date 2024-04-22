@@ -64,25 +64,34 @@ function FriendNeedsHome() {
       const response = await axios.get(
         "http://localhost:8000/api/user/gallery"
       );
-
-      const sortedImages = response.data.sort((a, b) => {
+  
+      console.log("Response Data:", response.data);
+  
+      const sortedPets = response.data.sort((a, b) => {
         const timeA = new Date(a.createdAt).getTime();
         const timeB = new Date(b.createdAt).getTime();
         return timeA - timeB;
       });
-
+  
+      // Log the _id of each image
+      sortedPets.forEach((pet) => {
+        const petId = pet._id;
+        console.log("pet _id:", petId);
+      });
+  
       setuserGalleryData(
-        sortedImages.map((image) => ({ ...image, isAdoptFormVisible: false }))
+        sortedPets.map((image) => ({ ...image, isAdoptFormVisible: false }))
       );
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   };
+  
 
   const handleAddToGallery = async () => {
     try {
-      const token = localStorage.getItem("token");
-      const verified = localStorage.getItem("verified");
+      const token = await localStorage.getItem("token");
+      const verified = await localStorage.getItem("verified");
 
       if (!token) {
         toast.error("You need to log in first, please log in");
@@ -108,7 +117,7 @@ function FriendNeedsHome() {
       const formData = new FormData();
 
       selectedImage.forEach((file) => formData.append("images", file));
-
+      
       formData.append("caption", caption);
       formData.append("breed", breed);
       formData.append("gender", gender);
@@ -143,24 +152,21 @@ function FriendNeedsHome() {
     document.body.classList.remove("modal-open");
   };
 
-  return (
+   return (
     <div className="gallery-main">
-      
       <section className="text-gray-600 body-font">
-        <br />
-        
         <div className="flex items-center justify-center font-semibold text-xl">
-          <h1>Available to Adopt</h1>
+          <h1>Pets Available to Adopt</h1>
         </div>
         <div className="gallery-container">
-        <div className="flex justify-end mb-4">
-        <button
-          onClick={() => setIsFormVisible(!isFormVisible)}
-          className="px-2 border-solid rounded-2xl py-3 font-semibold hover:bg-green-500 hover:text-white"
-        >
-          {isFormVisible
-            ? "Hide Pet adoption advocate"
-            : "Pet adoption advocate"}
+          <div className="flex justify-end mb-4">
+            <button
+              onClick={() => setIsFormVisible(!isFormVisible)}
+              className="max-h-12 px-2 border-solid rounded-2xl py-3 font-semibold hover:bg-green-500 hover:text-white"
+            >
+               {isFormVisible
+            ? "Pending"
+            : "+ Add Pets"}
         </button>
         </div>
         {isFormVisible && (
@@ -183,7 +189,7 @@ function FriendNeedsHome() {
                   <div className="sm:flex sm:items-start">
                     <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
                       <h3 className="text-lg leading-6 font-medium text-gray-900">
-                        Pet Advocate Form
+                        Pets for Adoption Form
                       </h3>
                       <div className="mt-2">
                         <label className="form-group-label">
@@ -317,59 +323,49 @@ function FriendNeedsHome() {
             </div>
           </div>
         )}
-      </div>
-        <div className="container px-5 py-24 mx-auto">
-          <div className="flex flex-wrap -m-4">
-          {usergalleryData.map((group) => (
-  <div key={group._id} className="lg:w-1/4 md:w-1/2 p-4 w-full">
-    <a
-      className="block relative h-48 rounded overflow-hidden"
-      onClick={() => openModal(group.images[0].imageUrls)} // Assuming you want to open modal with the first image URL
-    >
-      {group.images.map((image, index) => (
-        <div key={index}>
-          <img
-            alt={image.caption}
-            className="w-full h-full object-cover"
-            style={{ width: '200px', height: '200px' }} // Set your desired width and height here
-            src={`http://localhost:8000/uploads/${image.imageUrls[0]}`} // Assuming imageUrls is an array of strings
-          />
-        </div>
-      ))}
-    </a>
-    <div className="mt-4">
-      <div className="information">
-        <p>
-          <strong>Posted by:</strong> {group.user_email}
-        </p>
-        <p>
-          <strong>Caption:</strong> {group.images[0].caption}
-        </p>
-        <p>
-          <strong>Species:</strong> {group.images[0].species}
-        </p>
-        <p>
-          <strong>Breed:</strong> {group.images[0].breed}
-        </p>
-        <p>
-          <strong>Gender:</strong> {group.images[0].gender}
-        </p>
-        <p>
-          <strong>Age in months:</strong> {group.images[0].age}
-        </p>
-        <p>
-          <strong>Medical History:</strong> {group.images[0].medhistory} {group.images[0].others}
-        </p>
-      </div>
-      <TalkToTheUser imageUrl={group.images[0].imageUrl} />
-      <h2 className="text-gray-900 title-font text-lg font-medium">
-        {group.caption}
-      </h2>
-      <p className="mt-1">{group.category}</p>
-    </div>
-  </div>
-))}
+          <div className="container px-5 py-24 mx-auto">
+            <div className="flex flex-wrap -m-4">
+              {usergalleryData.map((item) => (
+                <div key={item._id} className="lg:w-1/4 md:w-1/2 p-4 w-full">
+                  <a
+                    className="block relative h-48 rounded overflow-hidden"
+                    onClick={() => openModal(item.imageUrls[0])} // Assuming you want to open modal with the first image URL
+                  >
+                    <img
+                      alt={item.caption}
+                      className="w-full h-full object-cover"
+                      style={{ width: "200px", height: "200px" }}
+                      src={`http://localhost:8000/uploads/${item.imageUrls[0]}`}
+                    />
+                  </a>
+                  <div className="mt-4">
+                  <p>
+                      <strong>ID:</strong> {item._id}
+                    </p>
+                    <p>
+                      <strong>Caption:</strong> {item.caption}
+                    </p>
+                    <p>
+                      <strong>Species:</strong> {item.species}
+                    </p>
+                    <p>
+                      <strong>Breed:</strong> {item.breed}
+                    </p>
+                    <p>
+                      <strong>Gender:</strong> {item.gender}
+                    </p>
+                    <p>
+                      <strong>Age in months:</strong> {item.age}
+                    </p>
+                    <p>
+                      <strong>Medical History:</strong> {item.medhistory.join(", ")} {item.others}
+                    </p>
+                    <TalkToTheUser imageUrl={item.imageUrls[0]} petId={item._id} />
 
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
