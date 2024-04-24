@@ -83,19 +83,20 @@ function AdoptionProcess() {
     }
   };
 
-  const handleDeleteAdoptionRequest = async (id) => {
-    console.log("Deleting adoption request with id:", id);
+  const handleDeleteAdoptionRequest = async (userId) => {
     try {
-      await axios.delete(`http://localhost:8000/api/adoption/request/delete/${id}`);
-      console.log("Adoption request deleted successfully");
-      // Filter out the deleted request from the state
-      setAdoptionRequests(adoptionrequests.filter(request => request._id !== id));
-      toast.success("Adoption request deleted successfully");
+        // Make a DELETE request to your backend API
+        await axios.delete(`http://localhost:8000/api/adoption/request/delete/${userId}`);
+        // Optionally, you may want to update the state in the frontend to reflect the deletion.
+        // This depends on your application's structure.
+        // For example, you can filter out the deleted request from the state.
+        setAdoptionRequests(adoptionrequests.filter(request => request._id !== userId));
+        toast.success("Adoption request deleted successfully");
     } catch (error) {
-      console.error("Error deleting adoption request", error);
-      toast.error("Failed to delete adoption request");
+        console.error("Error deleting adoption request", error);
+        toast.error("Failed to delete adoption request");
     }
-  };
+};
   
 
   return (
