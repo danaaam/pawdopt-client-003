@@ -128,8 +128,8 @@ function FriendNeedsHome() {
       });
 
       toast.success("Image uploaded successfully and pending approval");
-      // Reload the page after a successful upload
-      // window.location.reload();
+      
+      window.location.reload();
     } catch (error) {
       console.error("Error uploading:", error);
       console.log("Error response:", error.response);
@@ -284,6 +284,7 @@ function FriendNeedsHome() {
         <div className="mt-6 flex justify-end">
           <button
             type="submit"
+            onClick={() => setIsFormVisible(true)}
             className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 focus:outline-none focus:ring focus:ring-green-500 focus:ring-opacity-50"
           >
             Add to Gallery
