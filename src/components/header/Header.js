@@ -174,6 +174,12 @@ export const Header = () => {
                       Adoption Request
                     </Link>
                     <Link
+                      to="/adoption-archives"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:text-[#6dbb48] hover:bg-gray-100"
+                    >
+                      Adoption Archives
+                    </Link>
+                    <Link
                       to="/users"
                       className="block px-4 py-2 text-sm text-gray-700 hover:text-[#6dbb48] hover:bg-gray-100"
                     >

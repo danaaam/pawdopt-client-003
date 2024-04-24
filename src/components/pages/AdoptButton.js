@@ -8,6 +8,7 @@ const AdoptButton = ({ imageUrl, petId }) => {
   const [isAdoptFormVisible, setIsAdoptFormVisible] = useState(false);
   const [name, setName] = useState('');
   const [address, setAddress] = useState('');
+  const [email, setEmail] = useState('');
   const [contactInfo, setContactInfo] = useState('');
   const [message, setMessage] = useState('');
   const navigate = useNavigate();
@@ -31,10 +32,11 @@ const AdoptButton = ({ imageUrl, petId }) => {
         navigate('/valid');
         return;
       }
-  
+
       const adoptionData = {
         name,
         address,
+        email, // Include email in the adoption request data
         contactInfo,
         message,
         imageUrl,
@@ -46,7 +48,7 @@ const AdoptButton = ({ imageUrl, petId }) => {
         adoptionData,
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${token}`
           },
         }
       );
@@ -54,19 +56,19 @@ const AdoptButton = ({ imageUrl, petId }) => {
       if (response.status === 201) {
         toast.success('Successfully submitted a request');
         setIsAdoptFormVisible(false); // Close the modal after successful submission
+        window.location.reload();
       } else {
         console.error('Error submitting adoption request:', response.data.error);
       }
     } catch (error) {
       console.error('Error submitting adoption request:', error);
     }
-  };
+  };  
   
-
   return (
     <div className="adoption-form">
       <button className="adopt-button" onClick={handleAdoptFormVisibility}>
-        Adopt request
+        Adopt Request
       </button>
       {isAdoptFormVisible && (
         <div className="modal-overlay">

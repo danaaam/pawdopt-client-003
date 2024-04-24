@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 
-function AdoptionProcess() {
+function ArchivedRequests() {
   const [adoptionrequests, setAdoptionRequests] = useState([]);
   const [adoptionData, setadoptionData] = useState([]);
 
@@ -37,8 +37,8 @@ function AdoptionProcess() {
       try {
         const response = await axios.get("http://localhost:8000/api/get/adoption/requests");
         console.log(response);
-        // Filter adoption requests to include those with status "pending"
-        const filteredRequests = response.data.filter(request => request.status == "pending" );
+        // Filter adoption requests to exclude those with status "pending"
+        const filteredRequests = response.data.filter(request => request.status !== "pending" );
         setAdoptionRequests(filteredRequests);
 
         // Initialize admin messages state for each adoption request
@@ -70,30 +70,20 @@ function AdoptionProcess() {
     }
   };
   
-  const handleDecline = async (id) => {
+  const handleDecline = async (id) => { 
     try {
       await axios.put(
         `http://localhost:8000/api/adoption/request/decline/${id}`,
-        { adminMessage: adminMessage[id] },
-        { headers: { "Content-Type": "application/json" } }
+        { adminMessage: adminMessage[id] }, 
+        { headers: { "Content-Type": "application/json" } } 
       );
-      
-      // Update pet_status to "for adoption" for associated UserGallery records
-      const adoptionRequest = adoptionrequests.find(request => request._id === id);
-      if (adoptionRequest) {
-        const adoptionRequestsIds = adoptionRequest.adoptionRequests;
-        adoptionRequestsIds.forEach(async (adoptionRequestId) => {
-          await axios.put(`http://localhost:8000/api/cancel/adoption/request//${adoptionRequestId}`);
-        });
-      }
-      
       toast.warning("Declined");
       window.location.reload();
     } catch (error) {
       console.error("Error updating adoption request", error);
     }
   };
-
+  
   return (
     <div className="overflow-x-auto">
       <table className="min-w-full divide-y divide-gray-200">
@@ -177,4 +167,4 @@ function AdoptionProcess() {
   );
 }
 
-export default AdoptionProcess;
+export default ArchivedRequests;
