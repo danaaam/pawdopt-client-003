@@ -11,6 +11,7 @@ function FriendNeedsHome() {
   const [usergalleryData, setuserGalleryData] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate("");
+  const [formSubmitted, setFormSubmitted] = useState(false);
 
   //uploading field
   const [caption, setCaption] = useState("");
@@ -57,8 +58,9 @@ function FriendNeedsHome() {
 
   useEffect(() => {
     fetchData();
+    console.log("useEffect ran")
   }, []);
-
+  
   const fetchData = async () => {
     try {
       const response = await axios.get(
@@ -87,11 +89,12 @@ function FriendNeedsHome() {
     }
   };
   
+  const handleAddToGallery = async (event) => {
+    event.preventDefault(); // Prevent default form submission
 
-  const handleAddToGallery = async () => {
     try {
-      const token = await localStorage.getItem("token");
-      const verified = await localStorage.getItem("verified");
+      const token = localStorage.getItem("token");
+      const verified = localStorage.getItem("verified");
 
       if (!token) {
         toast.error("You need to log in first, please log in");
@@ -103,21 +106,13 @@ function FriendNeedsHome() {
         navigate("/valid");
         return;
       }
-      if (
-        !selectedImage ||
-        !caption ||
-        !breed ||
-        !gender ||
-        !age ||
-        medhistory.length === 0
-      ) {
+      if (!selectedImage || !caption || !breed || !gender || !age || medhistory.length === 0) {
         toast.error("All fields are required");
         return;
       }
-      const formData = new FormData();
 
+      const formData = new FormData();
       selectedImage.forEach((file) => formData.append("images", file));
-      
       formData.append("caption", caption);
       formData.append("breed", breed);
       formData.append("gender", gender);
@@ -131,14 +126,16 @@ function FriendNeedsHome() {
           Authorization: `Bearer ${token}`,
         },
       });
+
       toast.success("Image uploaded successfully and pending approval");
-      window.location.reload();
+      // Reload the page after a successful upload
+      // window.location.reload();
     } catch (error) {
       console.error("Error uploading:", error);
       console.log("Error response:", error.response);
     }
   };
-
+  
   const openModal = (imageUrls) => {
     setSelectedImage({ imageUrls });
     setIsModalOpen(true);
@@ -153,224 +150,181 @@ function FriendNeedsHome() {
   };
 
    return (
-    <div className="gallery-main">
-      <section className="text-gray-600 body-font">
-        <div className="flex items-center justify-center font-semibold text-xl">
-          <h1>Pets Available to Adopt</h1>
+    <div className="bg-gray-100 min-h-screen py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h1 className="text-3xl font-extrabold text-gray-900">Pets Available to Adopt</h1>
+        <div className="mt-8 flex justify-end">
+          <button
+            onClick={() => setIsFormVisible(!isFormVisible)}
+            className="px-4 py-2 rounded-md bg-green-500 text-white hover:bg-green-600 transition duration-300"
+          >
+            {isFormVisible ? "Pending" : "+ Add Pets"}
+          </button>
         </div>
-        <div className="gallery-container">
-          <div className="flex justify-end mb-4">
-            <button
-              onClick={() => setIsFormVisible(!isFormVisible)}
-              className="max-h-12 px-2 border-solid rounded-2xl py-3 font-semibold hover:bg-green-500 hover:text-white"
+      </div>
+      {isFormVisible && (
+  <div className="mt-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="bg-white p-6 rounded-lg shadow-md">
+      <h3 className="text-lg font-semibold mb-4">Pets for Adoption Form</h3>
+      <form onSubmit={handleAddToGallery}>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <label className="block">
+            <span className="text-gray-700">Maximum of 4 images</span>
+            <input
+              className="mt-1 p-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50"
+              type="file"
+              accept="image/*"
+              onChange={handleFileChange}
+              multiple
+              required
+            />
+          </label>
+          <label className="block">
+            <span className="text-gray-700">Caption:</span>
+            <input
+              className="mt-1 p-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50"
+              type="text"
+              placeholder="Enter Caption"
+              value={caption}
+              onChange={handleEditCaption}
+              required
+            />
+          </label>
+          <label className="block">
+            <span className="text-gray-700">Breed:</span>
+            <input
+              className="mt-1 p-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50"
+              type="text"
+              placeholder="Enter Breed"
+              value={breed}
+              onChange={handleEditBreed}
+              required
+            />
+          </label>
+          <label className="block">
+            <span className="text-gray-700">Species:</span>
+            <input
+              className="mt-1 p-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50"
+              type="text"
+              placeholder="Type of animal"
+              value={species}
+              onChange={handleEditSpecies}
+            />
+          </label>
+          <label className="block">
+            <span className="text-gray-700">Select Gender:</span>
+            <select
+              className="mt-1 p-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50"
+              value={gender}
+              onChange={handleEditGender}
+              required
             >
-               {isFormVisible
-            ? "Pending"
-            : "+ Add Pets"}
-        </button>
-        </div>
-        {isFormVisible && (
-          <div className="fixed z-10 inset-0 overflow-y-auto">
-            <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-              <div
-                className="fixed inset-0 transition-opacity"
-                aria-hidden="true"
-              >
-                <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
-              </div>
-              <span
-                className="hidden sm:inline-block sm:align-middle sm:h-screen"
-                aria-hidden="true"
-              >
-                &#8203;
-              </span>
-              <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-                <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                  <div className="sm:flex sm:items-start">
-                    <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                      <h3 className="text-lg leading-6 font-medium text-gray-900">
-                        Pets for Adoption Form
-                      </h3>
-                      <div className="mt-2">
-                        <label className="form-group-label">
-                          Maximum of 4 images
-                          <input
-                            className="form-group-input"
-                            type="file"
-                            accept="images/*"
-                            onChange={handleFileChange}
-                            multiple
-                            required
-                          />
-                        </label>
-                        <label className="form-group-label">
-                          Caption:
-                          <input
-                            className="form-group-input"
-                            type="text"
-                            placeholder="Enter Caption"
-                            value={caption}
-                            onChange={handleEditCaption}
-                            required
-                          />
-                        </label>
-                        <label className="form-group-label">
-                          Breed:
-                          <input
-                            className="form-group-input"
-                            type="text"
-                            placeholder="Enter Breed"
-                            value={breed}
-                            onChange={handleEditBreed}
-                            required
-                          />
-                        </label>
-                        <label className="form-group-label">
-                          Species:
-                          <input
-                            className="form-group-input"
-                            type="text"
-                            placeholder="Type of animal"
-                            value={species}
-                            onChange={handleEditSpecies}
-                          />
-                        </label>
-                        <label className="form-group-label">
-                          Select gender:
-                          <select
-                            value={gender}
-                            onChange={handleEditGender}
-                            required
-                          >
-                            <option value="" required disabled>
-                              Select Gender
-                            </option>
-                            <option value="male">Male</option>
-                            <option value="female">Female</option>
-                          </select>
-                        </label>
-                        <label className="form-group-label">
-                          Age:
-                          <input
-                            className="form-group-input"
-                            type="text"
-                            placeholder="Age in months"
-                            value={age}
-                            onChange={handleEditAge}
-                            required
-                          />
-                        </label>
-                        <br />
-                        <label className="form-group-label">
-                          Medical History:{" "}
-                        </label>
-                        <label className="form-group-label px-2">
-                          <input
-                            className="form-group-input"
-                            type="checkbox"
-                            value="vaccinated"
-                            checked={medhistory.includes("vaccinated")}
-                            onChange={handleEditMedHistory}
-                          />
-                          Vaccinated
-                        </label>
-                        <label className="form-group-label">
-                          <input
-                            className="form-group-input"
-                            type="checkbox"
-                            value="dewormed"
-                            checked={medhistory.includes("dewormed")}
-                            onChange={handleEditMedHistory}
-                          />
-                          Dewormed
-                        </label>
-                        <label className="form-group-label">
-                          <input
-                            className="form-group-input"
-                            type="checkbox"
-                            value="neutered"
-                            checked={medhistory.includes("neutered")}
-                            onChange={handleEditMedHistory}
-                          />
-                          Neutered
-                        </label>
-                        <label className="form-group-label">
-                          Others:
-                          <input
-                            className="form-group-input"
-                            type="text"
-                            placeholder="Please specify"
-                            value={others}
-                            onChange={handleEditOthers}
-                          />
-                        </label>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                  <button onClick={handleAddToGallery} className="add-gallery">
-                    Add to Gallery
-                  </button>
-                  <button
-                    onClick={() => setIsFormVisible(false)}
-                    className="add-gallery"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </div>
+              <option value="" disabled>Select Gender</option>
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+            </select>
+          </label>
+          <label className="block">
+            <span className="text-gray-700">Age:</span>
+            <input
+              className="mt-1 p-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50"
+              type="text"
+              placeholder="Age in months"
+              value={age}
+              onChange={handleEditAge}
+              required
+            />
+          </label>
+          <div className="col-span-2">
+            <span className="text-gray-700">Medical History:</span>
+            <div className="mt-2 space-y-2">
+              <label className="flex items-center">
+                <input
+                  type="checkbox"
+                  className="rounded border-gray-300"
+                  value="vaccinated"
+                  checked={medhistory.includes("vaccinated")}
+                  onChange={handleEditMedHistory}
+                />
+                <span className="ml-2">Vaccinated</span>
+              </label>
+              <label className="flex items-center">
+                <input
+                  type="checkbox"
+                  className="rounded border-gray-300"
+                  value="dewormed"
+                  checked={medhistory.includes("dewormed")}
+                  onChange={handleEditMedHistory}
+                />
+                <span className="ml-2">Dewormed</span>
+              </label>
+              <label className="flex items-center">
+                <input
+                  type="checkbox"
+                  className="rounded border-gray-300"
+                  value="neutered"
+                  checked={medhistory.includes("neutered")}
+                  onChange={handleEditMedHistory}
+                />
+                <span className="ml-2">Neutered</span>
+              </label>
             </div>
           </div>
-        )}
-          <div className="container px-5 py-24 mx-auto">
-            <div className="flex flex-wrap -m-4">
-              {usergalleryData.map((item) => (
-                <div key={item._id} className="lg:w-1/4 md:w-1/2 p-4 w-full">
-                  <a
-                    className="block relative h-48 rounded overflow-hidden"
-                    onClick={() => openModal(item.imageUrls[0])} // Assuming you want to open modal with the first image URL
-                  >
-                    <img
-                      alt={item.caption}
-                      className="w-full h-full object-cover"
-                      style={{ width: "200px", height: "200px" }}
-                      src={`http://localhost:8000/uploads/${item.imageUrls[0]}`}
-                    />
-                  </a>
-                  <div className="mt-4">
-                  <p>
-                      <strong>ID:</strong> {item._id}
-                    </p>
-                    <p>
-                      <strong>Caption:</strong> {item.caption}
-                    </p>
-                    <p>
-                      <strong>Species:</strong> {item.species}
-                    </p>
-                    <p>
-                      <strong>Breed:</strong> {item.breed}
-                    </p>
-                    <p>
-                      <strong>Gender:</strong> {item.gender}
-                    </p>
-                    <p>
-                      <strong>Age in months:</strong> {item.age}
-                    </p>
-                    <p>
-                      <strong>Medical History:</strong> {item.medhistory.join(", ")} {item.others}
-                    </p>
-                    <TalkToTheUser imageUrl={item.imageUrls[0]} petId={item._id} />
+          <label className="block">
+            <span className="text-gray-700">Others:</span>
+            <input
+              className="mt-1 p-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50"
+              type="text"
+              placeholder="Please specify"
+              value={others}
+              onChange={handleEditOthers}
+            />
+          </label>
+        </div>
+        <div className="mt-6 flex justify-end">
+          <button
+            type="submit"
+            className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 focus:outline-none focus:ring focus:ring-green-500 focus:ring-opacity-50"
+          >
+            Add to Gallery
+          </button>
+          <button
+            type="button"
+            onClick={() => setIsFormVisible(false)}
+            className="ml-4 px-4 py-2 bg-gray-400 text-white rounded-md hover:bg-gray-500 focus:outline-none focus:ring focus:ring-gray-400 focus:ring-opacity-50"
+          >
+            Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+)}
+      <div className="mt-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {usergalleryData.map((item) => (
+            <div key={item._id} className="bg-white rounded-lg shadow-md p-4">
+              <img
+                alt={item.caption}
+                src={`http://localhost:8000/uploads/${item.imageUrls[0]}`}
+                className="w-full h-48 object-cover rounded-lg"
+              />
+              <div className="mt-4">
+                <p className="text-sm font-medium text-gray-900"><span style={{ fontWeight: 'bold' }}>ID:</span> {item._id}</p>
+                <p className="text-sm text-gray-600"><span style={{ fontWeight: 'bold' }}>Caption:</span> {item.caption}</p>
+                <p className="text-sm text-gray-600"><span style={{ fontWeight: 'bold' }}>Species:</span> {item.species}</p>
+                <p className="text-sm text-gray-600"><span style={{ fontWeight: 'bold' }}>Breed:</span> {item.breed}</p>
+                <p className="text-sm text-gray-600"><span style={{ fontWeight: 'bold' }}>Gender:</span> {item.gender}</p>
+                <p className="text-sm text-gray-600"><span style={{ fontWeight: 'bold' }}>Age in months:</span> {item.age}</p>
+                <p className="text-sm text-gray-600"><span style={{ fontWeight: 'bold' }}>Medical History:</span> {item.medhistory.join(", ")} {item.others}</p>
+                <TalkToTheUser imageUrl={item.imageUrls[0]} petId={item._id} />
+              </div>
 
-                  </div>
-                </div>
-              ))}
             </div>
-          </div>
+          ))}
         </div>
-      </section>
+      </div>
     </div>
   );
 }
-
 export default FriendNeedsHome;

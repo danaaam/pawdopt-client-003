@@ -21,6 +21,7 @@ import AdoptionStatusPage from "../links/AdoptionStatusPage.js";
 import SendOtpPage from "../links/SendOtpPage";
 import SubmitOtpPage from "../links/SubmitOtpPage";
 import UserProfileEditPage from "../links/UserProfileEditPage.js";
+import ArchivedPage from "../adminpanel/adminpages/adminpagescss/Links/ArchivedPage.js";
 
 
 function Router() {
@@ -49,6 +50,7 @@ function Router() {
         <Route path="send-otp" element={<SendOtpPage/>} />
         <Route path="submit-otp" element={<SubmitOtpPage/>} />
         <Route path="adoption-request" element={<AdoptionPage />} />
+        <Route path="adoption-archives" element={<ArchivedPage />} />
         <Route path="upload" element={<GalleryPage />} />
         <Route path="users" element={<UserPage />} />
         <Route path="edit-profile" element={<UserProfileEditPage />} />
