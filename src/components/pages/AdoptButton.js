@@ -36,7 +36,7 @@ const AdoptButton = ({ imageUrl, petId }) => {
       const adoptionData = {
         name,
         address,
-        email, // Include email in the adoption request data
+        email, // Include email in the adoption request data. email is from the user token
         contactInfo,
         message,
         imageUrl,

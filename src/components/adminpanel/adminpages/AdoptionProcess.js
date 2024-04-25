@@ -83,7 +83,7 @@ function AdoptionProcess() {
       if (adoptionRequest) {
         const adoptionRequestsIds = adoptionRequest.adoptionRequests;
         adoptionRequestsIds.forEach(async (adoptionRequestId) => {
-          await axios.put(`http://localhost:8000/api/cancel/adoption/request//${adoptionRequestId}`);
+          await axios.put(`http://localhost:8000/api/cancel/adoption/request/${adoptionRequestId}`);
         });
       }
       
@@ -160,7 +160,7 @@ function AdoptionProcess() {
                     {group.images.map((image, index) => (
                       <div key={index} className="gallery-image-container">
                         <img 
-                          src={`http://localhost:8000/uploads/${image.imageUrl}`}
+                          src={`http://localhost:8000/uploads/${image.imageUrls}`}
                           alt={group.caption}
                           className="h-12 w-12 object-cover rounded-full"/> 
                       </div>

@@ -5,54 +5,72 @@ import { toast } from 'react-toastify';
 function AdoptionStatus() {
     const [adoptionRequests, setAdoptionRequests] = useState([]);
     const [loading, setLoading] = useState(true);
-    
-    useEffect(() => {
-        fetchAdoptionRequests();
-    }, []);
-  
-    const fetchAdoptionRequests = async (id) => {
-        try {
-            const token = localStorage.getItem('token');
-            const response = await axios.get(`http://localhost:8000/api/get/adoption/request/${id}`, {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            });
-            console.log('Response:', response.data);
-            setAdoptionRequests(response.data);
-            setLoading(false);
-        } catch (error) {
-            console.error('Error fetching adoption requests:', error);
-            setAdoptionRequests([]);
-            setLoading(false);
+
+    const getStatusColor = (status) => {
+        const normalizedStatus = status.toLowerCase();
+        switch (normalizedStatus) {
+            case 'pending':
+                return 'text-orange-500';
+            case 'approved':
+                return 'text-green-500';
+            case 'rejected':
+                return 'text-red-500';
+            default:
+                return 'text-gray-700';
         }
     };
-      
-  
+
+    useEffect(() => {
+        const fetchAdoptionRequests = async () => {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await axios.get('http://localhost:8000/api/get/adoption/requests', {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
+                console.log('Response:', response.data);
+                setAdoptionRequests(response.data);
+                setLoading(false);
+            } catch (error) {
+                console.error('Error fetching adoption requests:', error);
+                toast.error('Failed to fetch adoption requests');
+                setAdoptionRequests([]);
+                setLoading(false);
+            }
+        };
+
+        fetchAdoptionRequests();
+    }, []);
+
     return (
-        <div className="h-screen flex flex-col justify-center items-center">
-            <h1 className="text-center text-lg text-gray-700 mb-4 font-bold">Adoption Status</h1>
-            {loading ? (
-                <p className="text-center text-sm text-gray-700 mb-4 font-bold">Loading...</p>
-            ) : (
-                <ul className="text-center text-sm text-gray-700 mb-4 font-bold">
-                    {adoptionRequests.length === 0 ? (
-                        <p>No pending request</p>
-                    ) : (
-                        adoptionRequests.map((request) => (
-                            <div key={request._id} style={{ border: '1px solid #000', padding: '10px', marginBottom: '10px' }}>
-                                <p><strong>Status:</strong> {request.status}</p>
-                                <p><strong>Name:</strong> {request.name}</p>
-                                <p><strong>Contact Info:</strong> {request.contactinfo}</p>
-                                <p><strong>Address:</strong> {request.address}</p>
-                                <p><strong>Email:</strong> {request.email}</p>
-                                <p><strong>Pet's image:</strong> {request.imageUrl}</p>
-                                <p><strong>Admin's Message:</strong>{request.adminMessage}</p>
-                            </div>
-                        ))
-                    )}
-                </ul>
-            )}
+        <div className="h-screen flex flex-col justify-center items-center bg-gray-100">
+            <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-6">
+                <h1 className="text-center text-lg text-gray-700 mb-4 font-bold">Adoption Requests</h1>
+                {loading ? (
+                    <p className="text-center text-sm text-gray-700 mb-4 font-bold">Loading...</p>
+                ) : (
+                    <div className="grid gap-4">
+                        {adoptionRequests.length === 0 ? (
+                            <p className="text-center">No pending requests</p>
+                        ) : (
+                            adoptionRequests.map((request) => (
+                                <div key={request._id} className="border border-gray-300 rounded-lg p-4">
+                                    <p className={`${getStatusColor(request.status)} font-bold mb-2`}>
+                                        <strong></strong> {request.status}
+                                    </p>
+                                    <p><strong>Name:</strong> {request.name}</p>
+                                    <p><strong>Contact Info:</strong> {request.contactInfo}</p>
+                                    <p><strong>Address:</strong> {request.address}</p>
+                                    <p><strong>Email:</strong> {request.email}</p>
+                                    <p><strong>Pet's Image:</strong> {request.imageUrl}</p>
+                                    <p><strong>Admin's Message:</strong> {request.adminMessage}</p>
+                                </div>
+                            ))
+                        )}
+                    </div>
+                )}
+            </div>
         </div>
     );
 }
