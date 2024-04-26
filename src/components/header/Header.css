@@ -1,7 +1,18 @@
+/* Styling for active link */
 .active {
     background-color: #366b4d;
 }
+.container {
+    height: 100%; /* Ensure container takes up full height of the viewport */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem; /* Add padding as needed */
+    box-sizing: border-box; /* Ensure padding is included in height calculation */
+}
 
+/* Styling for navigation title */
 nav .title {
     font-size: 1.5rem;
     margin: 1rem;
@@ -12,6 +23,7 @@ nav .title {
     align-items: center;
 }
 
+/* Styling for navigation list */
 nav ul {
     display: flex;
     align-items: center;
@@ -31,12 +43,13 @@ nav ul li a {
     border-radius: 0.5rem;
 }
 
+/* Hover effect for navigation links */
 nav ul li a:not(.active):hover {
     background-color: #ccebc2;
 }
 
 nav .menu {
-    display: none;
+    display: none; /* Hide by default */
     position: absolute;
     top: 0.75rem;
     right: 0.5rem;
@@ -44,7 +57,15 @@ nav .menu {
     justify-content: space-between;
     width: 2.25rem;
     height: 2rem;
+    z-index: 100; /* Ensure the menu icon appears above other content */
 }
+
+@media (max-width: 480px) {
+    nav .menu {
+        display: flex; /* Show mobile menu icon on smaller screens */
+    }
+}
+
 
 nav .menu span {
     height: 0.4rem;
@@ -53,6 +74,7 @@ nav .menu span {
     border-radius: 0.2rem;
 }
 
+/* Styling for dropdown menu */
 nav .dropdown {
     position: relative;
     margin-right: 1.5rem;
@@ -70,7 +92,7 @@ nav .dropdown ul {
     padding: 0.5rem;
     border-radius: 0.5rem;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-    z-index: 999;
+    
 }
 
 nav .dropdown:hover ul {
@@ -85,44 +107,28 @@ nav .dropdown ul li a {
     margin: 0.2rem 0;
 }
 
+/* Media query for smaller screens */
 @media (max-width: 480px) {
-
-}
-
-
-
-nav .dropdown:hover ul {
-    display: flex;
-}
-
-nav .dropdown ul li {
-    width: 100%;
-    text-align: center;
-}
-
-nav .dropdown ul li a {
-    margin: 0.2rem 0;
-}
-
-@media (max-width: 480px) {
+    /* Display mobile menu icon */
     nav .menu {
         display: flex;
     }
 
+    /* Adjust navigation layout for smaller screens */
     nav {
         flex-direction: column;
         align-items: flex-start;
     }
 
     nav ul {
-        display: none;
+        display: none; /* Hide default nav items */
         flex-direction: column;
         width: 100%;
         margin-bottom: 0.25rem;
     }
 
     nav ul.open {
-        display: flex;
+        display: flex; /* Display when menu is open */
     }
 
     nav ul li {
@@ -133,15 +139,17 @@ nav .dropdown ul li a {
     nav ul li a {
         margin: 0.2rem 0.5rem;
     }
-    nav .dropdown ul{
+
+    /* Adjust dropdown menu for smaller screens */
+    nav .dropdown ul {
         flex-direction: column;
-        }
+    }
+
     nav .dropdown ul li {
         text-align: center;
     }
+
     nav .dropdown ul li a {
         margin: 0.1rem 0;
     }
-    
-    }
-
+}

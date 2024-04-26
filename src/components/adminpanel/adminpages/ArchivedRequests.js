@@ -150,9 +150,10 @@ function ArchivedRequests() {
                     {group.images.map((image, index) => (
                       <div key={index} className="gallery-image-container">
                         <img 
-                          src={`http://localhost:8000/uploads/${image.imageUrl}`}
-                          alt={group.caption}
-                          className="h-12 w-12 object-cover rounded-full"/> 
+                          src={`http://localhost:8000/uploads/${image.imageUrls[0]}`}  // Assuming imageUrls is an array; use imageUrls[0] to access the first URL
+                          alt={image.caption}  // Use image.caption for alt text
+                          className="h-12 w-12 object-cover rounded-full"
+                        /> 
                       </div>
                     ))}
                   </div>
