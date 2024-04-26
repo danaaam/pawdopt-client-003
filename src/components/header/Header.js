@@ -25,7 +25,7 @@ export const Header = () => {
     localStorage.removeItem("verified");
     localStorage.removeItem("role");
     window.localStorage.removeItem("isLoggedin"); 
-    navigate("/login");
+    navigate("/signin");
   };
 
   const handleClickUserstatus = () => {
@@ -36,7 +36,7 @@ export const Header = () => {
   };
 
   useEffect(() => {
-  },[handleLogout]);
+  },[]);
 
   return (
     <header class="text-gray-900 body-font bg-[#6dbb48]">

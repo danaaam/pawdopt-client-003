@@ -31,7 +31,7 @@ const Signup = () => {
       });
       if (response.status === 200) {
         console.log(handleSubmit);
-        navigate("/login");
+        navigate("/signin");
         toast.success("Account successfully created");
       } else {
         console.error("Unexpected status code:", response.status);
