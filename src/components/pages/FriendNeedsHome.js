@@ -311,13 +311,23 @@ function FriendNeedsHome() {
                 className="w-full h-48 object-cover rounded-lg"
               />
               <div className="mt-4">
-                <p className="text-xs font-medium text-gray-900"><span>ID:</span> {item._id}</p>
+                <p className="text-xs font-medium text-green-400"> {item._id}</p>
                 <p className="text-sm text-gray-600"><span style={{ fontWeight: 'bold' }}>Caption:</span> {item.caption}</p>
                 <p className="text-sm text-gray-600"><span style={{ fontWeight: 'bold' }}>Species:</span> {item.species}</p>
                 <p className="text-sm text-gray-600"><span style={{ fontWeight: 'bold' }}>Breed:</span> {item.breed}</p>
                 <p className="text-sm text-gray-600"><span style={{ fontWeight: 'bold' }}>Gender:</span> {item.gender}</p>
                 <p className="text-sm text-gray-600"><span style={{ fontWeight: 'bold' }}>Age in months:</span> {item.age}</p>
-                <p className="text-sm text-gray-600"><span style={{ fontWeight: 'bold' }}>Medical History:</span> {item.medhistory.join(", ")} {item.others}</p>
+                <p className="text-sm text-gray-600">
+                <span style={{ fontWeight: 'bold' }}>Medical History:</span> 
+                  {item.medhistory.length > 0 ? (
+                    <>
+                      {item.medhistory.join(", ")}
+                      {item.others ? `, ${item.others}` : ''}
+                    </>
+                  ) : (
+                    item.others
+                  )}
+              </p>
                 <TalkToTheUser imageUrl={item.imageUrls[0]} petId={item._id} />
               </div>
 
