@@ -59,7 +59,7 @@ function FriendNeedsHome() {
   useEffect(() => {
     fetchData();
     console.log("useEffect ran")
-  }, []);
+  });
   
   const fetchData = async () => {
     try {
@@ -311,7 +311,7 @@ function FriendNeedsHome() {
                 className="w-full h-48 object-cover rounded-lg"
               />
               <div className="mt-4">
-                <p className="text-sm font-medium text-gray-900"><span style={{ fontWeight: 'bold' }}>ID:</span> {item._id}</p>
+                <p className="text-xs font-medium text-gray-900"><span>ID:</span> {item._id}</p>
                 <p className="text-sm text-gray-600"><span style={{ fontWeight: 'bold' }}>Caption:</span> {item.caption}</p>
                 <p className="text-sm text-gray-600"><span style={{ fontWeight: 'bold' }}>Species:</span> {item.species}</p>
                 <p className="text-sm text-gray-600"><span style={{ fontWeight: 'bold' }}>Breed:</span> {item.breed}</p>

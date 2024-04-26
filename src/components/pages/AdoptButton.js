@@ -56,7 +56,6 @@ const AdoptButton = ({ imageUrl, petId }) => {
       if (response.status === 201) {
         toast.success('Successfully submitted a request');
         setIsAdoptFormVisible(false); // Close the modal after successful submission
-        window.location.reload();
       } else {
         console.error('Error submitting adoption request:', response.data.error);
       }
