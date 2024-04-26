@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "./pagescss/FriendNeedsHome.css";
 import { useNavigate } from "react-router-dom";
-import TalkToTheUser from "./AdoptButton";
+import AdoptButton from "./AdoptButton";
 import { toast } from "react-toastify";
 
 function FriendNeedsHome() {
@@ -11,9 +11,11 @@ function FriendNeedsHome() {
   const [usergalleryData, setuserGalleryData] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate("");
-  const [formSubmitted, setFormSubmitted] = useState(false);
+  const [formSubmitted, setFormSubmitted] = useState(false); // State to track adoption submission
+  const [verified, setVerified] = useState(false);
+  const [updateCount, setUpdateCount] = useState(0);
 
-  //uploading field
+  // Remaining state variables for form fields
   const [caption, setCaption] = useState("");
   const [breed, setBreed] = useState("");
   const [age, setAge] = useState("");
@@ -25,21 +27,27 @@ function FriendNeedsHome() {
   const handleEditCaption = (event) => {
     setCaption(event.target.value);
   };
+
   const handleEditBreed = (event) => {
     setBreed(event.target.value);
   };
+
   const handleEditGender = (event) => {
     setGender(event.target.value);
   };
+
   const handleEditAge = (event) => {
     setAge(event.target.value);
   };
+
   const handleEditSpecies = (event) => {
     setSpecies(event.target.value);
   };
+
   const handleEditOthers = (event) => {
     setOthers(event.target.value);
   };
+
   const handleEditMedHistory = (event) => {
     const { value } = event.target;
     if (medhistory.includes(value)) {
@@ -51,61 +59,34 @@ function FriendNeedsHome() {
     }
   };
 
+  const handleButtonClick = () => {
+    if (verified === false) {
+      // User is not verified, toggle a message
+      toast.error("Your account is not yet verified.");
+      return;
+    } else {
+      // User is verified, toggle form visibility
+      setIsFormVisible(!isFormVisible);
+    }
+  };
+
   const handleFileChange = (event) => {
     const selectedFiles = Array.from(event.target.files); // Convert to array
     setSelectedImage(selectedFiles);
   };
 
-  useEffect(() => {
-    fetchData();
-    console.log("useEffect ran")
-  });
-  
-  const fetchData = async () => {
-    try {
-      const response = await axios.get(
-        "http://localhost:8000/api/user/gallery"
-      );
-  
-      console.log("Response Data:", response.data);
-  
-      const sortedPets = response.data.sort((a, b) => {
-        const timeA = new Date(a.createdAt).getTime();
-        const timeB = new Date(b.createdAt).getTime();
-        return timeA - timeB;
-      });
-  
-      // Log the _id of each image
-      sortedPets.forEach((pet) => {
-        const petId = pet._id;
-        console.log("pet _id:", petId);
-      });
-  
-      setuserGalleryData(
-        sortedPets.map((image) => ({ ...image, isAdoptFormVisible: false }))
-      );
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-  };
-  
   const handleAddToGallery = async (event) => {
     event.preventDefault(); // Prevent default form submission
 
     try {
       const token = localStorage.getItem("token");
-      const verified = localStorage.getItem("verified");
 
       if (!token) {
         toast.error("You need to log in first, please log in");
         navigate("/login");
         return;
       }
-      if (!verified) {
-        toast.error("Not yet verified, Click Ok to see Verification status");
-        navigate("/valid");
-        return;
-      }
+      
       if (!selectedImage || !caption || !breed || !gender || !age || medhistory.length === 0) {
         toast.error("All fields are required");
         return;
@@ -128,28 +109,47 @@ function FriendNeedsHome() {
       });
 
       toast.success("Image uploaded successfully and pending approval");
-      
+      setFormSubmitted(true); // Set formSubmitted to true upon successful submission
+
+      // Reload the page to update the gallery (you can use state to avoid full page reload)
       window.location.reload();
     } catch (error) {
       console.error("Error uploading:", error);
       console.log("Error response:", error.response);
     }
   };
-  
-  const openModal = (imageUrls) => {
-    setSelectedImage({ imageUrls });
-    setIsModalOpen(true);
 
-    document.body.classList.add("modal-open");
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get("http://localhost:8000/api/user/gallery");
+        const sortedPets = response.data.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+        const updatedData = sortedPets.map((image) => ({ ...image, isAdoptFormVisible: false }));
+        setuserGalleryData(updatedData);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+    handleSetVerified();
+  }, [updateCount, formSubmitted]);
+
+  const handleSetVerified = () => {
+    const isVerified = localStorage.getItem('verified');
+    if (isVerified !== null) {
+      const verifiedStatus = isVerified === 'true';
+      setVerified(verifiedStatus);
+    } else {
+      console.log('Verification status not found in local storage');
+    }
   };
 
-  const closeModal = () => {
-    setIsModalOpen(false);
-
-    document.body.classList.remove("modal-open");
+  const handleAdoptionSubmitted = () => {
+    setFormSubmitted(true); // Set formSubmitted to true upon successful adoption submission
   };
 
-   return (
+  return (
     <div className="bg-gray-100 min-h-screen py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <h1 className="text-3xl font-extrabold text-gray-900">Pets Available to Adopt</h1>
@@ -328,8 +328,12 @@ function FriendNeedsHome() {
                     item.others
                   )}
               </p>
-                <TalkToTheUser imageUrl={item.imageUrls[0]} petId={item._id} />
-              </div>
+              <AdoptButton
+                imageUrl={item.imageUrls[0]}
+                petId={item._id}
+                onAdoptionSubmitted={handleAdoptionSubmitted} // Pass callback to AdoptButton
+              />
+            </div>
 
             </div>
           ))}
@@ -338,4 +342,5 @@ function FriendNeedsHome() {
     </div>
   );
 }
+
 export default FriendNeedsHome;

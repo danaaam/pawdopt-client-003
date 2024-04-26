@@ -3,6 +3,7 @@ import { FaLocationArrow } from "react-icons/fa6";
 
 import "./Header.css";
 import { Link, useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 
 export const Header = () => {
   const isLoggedIn = localStorage.getItem("token", "role");
@@ -33,6 +34,9 @@ export const Header = () => {
   const handleClickAdoptionStatus = () => {
     navigate('/adoption-status');
   };
+
+  useEffect(() => {
+  },[handleLogout]);
 
   return (
     <header class="text-gray-900 body-font bg-[#6dbb48]">

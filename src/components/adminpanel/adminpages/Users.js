@@ -96,12 +96,11 @@ function Users() {
         updatedUser
       );
       fetchUsers();
-      toast.success("Changes saved");
-      window.location.reload(); 
     } catch (error) {
       console.error("Error toggling user verification:", error);
     }
   };
+  
 
   return (
     <div className="overflow-x-auto">
@@ -222,13 +221,16 @@ function Users() {
                   {editingUserId === user._id ? (
                     <div className="flex items-center">
                       <select
-                        value={user.verified ? "true" : "false"}
-                        onChange={(e) => handleToggleVerification(user, e.target.value === "true", e.target.nextElementSibling.value)}
-                        className="mr-2 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-indigo-200"
-                      >
-                        <option value="false">Unverify</option>
-                        <option value="true">Verify</option>
-                      </select>
+                      value={user.verified ? "true" : "false"}
+                      onChange={(e) =>
+                        handleToggleVerification(user, e.target.value === "true")
+                      }
+                      className="mr-2 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-indigo-200"
+                    >
+                      <option value="false">Unverify</option>
+                      <option value="true">Verify</option>
+                    </select>
+
                     </div>
                   ) : (
                     <span>{user.verified ? "Verified" : "Not Verified"}</span>
