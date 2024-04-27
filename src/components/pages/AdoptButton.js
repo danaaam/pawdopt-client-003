@@ -25,7 +25,7 @@ const AdoptButton = ({ imageUrl, petId, onAdoptionSubmitted }) => {
       const verified = localStorage.getItem('verified');
       if (!token) {
         toast.error('You need to log in first, please log in');
-        navigate('/login');
+        navigate('/signin');
         return;
       }
       if (!verified) {

@@ -60,13 +60,12 @@ function FriendNeedsHome() {
   };
 
   const handleButtonClick = () => {
-    if (verified === false) {
-      // User is not verified, toggle a message
-      toast.error("Your account is not yet verified.");
-      return;
-    } else {
-      // User is verified, toggle form visibility
+    const isLoggedIn = localStorage.getItem('token');
+    if (isLoggedIn) {
       setIsFormVisible(!isFormVisible);
+    } else {
+      toast.error("You need to login first");
+      navigate('/signin')
     }
   };
 
@@ -83,7 +82,7 @@ function FriendNeedsHome() {
 
       if (!token) {
         toast.error("You need to log in first, please log in");
-        navigate("/login");
+        navigate("/signin");
         return;
       }
       
@@ -155,7 +154,7 @@ function FriendNeedsHome() {
         <h1 className="text-3xl font-extrabold text-gray-900">Pets Available to Adopt</h1>
         <div className="mt-8 flex justify-end">
           <button
-            onClick={() => setIsFormVisible(!isFormVisible)}
+            onClick={() => handleButtonClick()}
             className="px-4 py-2 rounded-md bg-green-500 text-white hover:bg-green-600 transition duration-300"
           >
             {isFormVisible ? "Pending" : "+ Add Pets"}

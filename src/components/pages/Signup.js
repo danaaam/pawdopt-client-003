@@ -253,7 +253,7 @@ const Signup = () => {
                 <p className="mt-10 text-center text-sm text-gray-500">
                   Already a member?{" "}
                   <Link
-                    to="/login"
+                    to="/signin"
                     className="font-semibold leading-6 text-[#6dbb48] hover:text-[#77df47]"
                   >
                     Login
