@@ -44,7 +44,7 @@ function Router() {
         <Route path="available-to-adopt" element={<AvailablePage />} />
         <Route path="how-to" element={<HowPage />} />
         <Route path="signup" element={login ? <HomePage/> :<SignupPage/>} />
-        <Route path="login" element={login ? <HomePage/> :<LoginPage />} />
+        <Route path="signin" element={login ? <HomePage/> :<LoginPage />} />
         <Route path="valid" element={<ValidityPage/>} />
         <Route path="adoption-status" element={<AdoptionStatusPage />} />
         <Route path="send-otp" element={<SendOtpPage/>} />

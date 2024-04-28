@@ -9,7 +9,7 @@ const Signup = () => {
   const [lastname, setLastname] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [contactinfo, setContactinfo] = useState("");
+  const [contactInfo, setContactInfo] = useState("");
   const [address, setAddress] = useState("");
 
 
@@ -26,18 +26,18 @@ const Signup = () => {
         lastname,
         email,
         password,
-        contactinfo,
+        contactInfo,
         address
       });
       if (response.status === 200) {
         console.log(handleSubmit);
-        navigate("/login");
+        navigate("/signin");
         toast.success("Account successfully created");
       } else {
         console.error("Unexpected status code:", response.status);
       }
     } catch (error) {
-      console.error("Signup error:", error.response.error);
+      console.error(error);
     }
   };
 
@@ -161,9 +161,9 @@ const Signup = () => {
                       <input
                         type="text"
                         placeholder="Contact Number"
-                        name="contactinfo"
-                        onChange={(e) => setContactinfo(e.target.value)}
-                        value={contactinfo}
+                        name="contactInfo"
+                        onChange={(e) => setContactInfo(e.target.value)}
+                        value={contactInfo}
                         required
                         className="w-full -ml-10 pl-10 pr-3 py-2 rounded-lg border-2 border-gray-200 outline-none focus:border-[#6dbb48]"
                       />
@@ -253,7 +253,7 @@ const Signup = () => {
                 <p className="mt-10 text-center text-sm text-gray-500">
                   Already a member?{" "}
                   <Link
-                    to="/login"
+                    to="/signin"
                     className="font-semibold leading-6 text-[#6dbb48] hover:text-[#77df47]"
                   >
                     Login

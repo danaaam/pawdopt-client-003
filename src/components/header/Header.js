@@ -3,6 +3,7 @@ import { FaLocationArrow } from "react-icons/fa6";
 
 import "./Header.css";
 import { Link, useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 
 export const Header = () => {
   const isLoggedIn = localStorage.getItem("token", "role");
@@ -24,7 +25,7 @@ export const Header = () => {
     localStorage.removeItem("verified");
     localStorage.removeItem("role");
     window.localStorage.removeItem("isLoggedin"); 
-    navigate("/login");
+    navigate("/");
   };
 
   const handleClickUserstatus = () => {

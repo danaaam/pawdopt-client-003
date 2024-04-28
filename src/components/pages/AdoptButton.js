@@ -1,17 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState } from 'react'; // Import useState from 'react'
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
+import { toast } from 'react-toastify'; // Import toast from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'; // Import toastify CSS
 import './AdoptButton.css'; // Import your custom CSS file for styling
 
-const AdoptButton = ({ imageUrl, petId }) => {
+const AdoptButton = ({ imageUrl, petId, onAdoptionSubmitted }) => {
   const [isAdoptFormVisible, setIsAdoptFormVisible] = useState(false);
   const [name, setName] = useState('');
   const [address, setAddress] = useState('');
-  const [email, setEmail] = useState('');
   const [contactInfo, setContactInfo] = useState('');
   const [message, setMessage] = useState('');
   const navigate = useNavigate();
+  const [isRequestSubmitted, setIsRequestSubmitted] = useState(false);
 
   const handleAdoptFormVisibility = () => {
     setIsAdoptFormVisible(!isAdoptFormVisible);
@@ -24,7 +25,7 @@ const AdoptButton = ({ imageUrl, petId }) => {
       const verified = localStorage.getItem('verified');
       if (!token) {
         toast.error('You need to log in first, please log in');
-        navigate('/login');
+        navigate('/signin');
         return;
       }
       if (!verified) {
@@ -36,7 +37,7 @@ const AdoptButton = ({ imageUrl, petId }) => {
       const adoptionData = {
         name,
         address,
-        email, // Include email in the adoption request data. email is from the user token
+        email: '', // Include email in the adoption request data. email is from the user token
         contactInfo,
         message,
         imageUrl,
@@ -55,14 +56,18 @@ const AdoptButton = ({ imageUrl, petId }) => {
   
       if (response.status === 201) {
         toast.success('Successfully submitted a request');
-        setIsAdoptFormVisible(false); // Close the modal after successful submission
+        setIsAdoptFormVisible(false);
+        setIsRequestSubmitted(true); // Set the state to true upon successful submission
+        if (onAdoptionSubmitted) {
+          onAdoptionSubmitted(); // Call the callback function if provided
+        }
       } else {
         console.error('Error submitting adoption request:', response.data.error);
       }
     } catch (error) {
       console.error('Error submitting adoption request:', error);
     }
-  };  
+  };
   
   return (
     <div className="adoption-form">
