@@ -1,11 +1,11 @@
-import React, { useState } from 'react'; // Import useState from 'react'
+import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify'; // Import toast from 'react-toastify'
-import 'react-toastify/dist/ReactToastify.css'; // Import toastify CSS
-import './AdoptButton.css'; // Import your custom CSS file for styling
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import './AdoptButton.css';
 
-const AdoptButton = ({ imageUrl, petId, onAdoptionSubmitted }) => {
+const AdoptButton = ({ imageUrl, petId, onAdoptionSubmitted, verified }) => {
   const [isAdoptFormVisible, setIsAdoptFormVisible] = useState(false);
   const [name, setName] = useState('');
   const [address, setAddress] = useState('');
@@ -71,8 +71,11 @@ const AdoptButton = ({ imageUrl, petId, onAdoptionSubmitted }) => {
   
   return (
     <div className="adoption-form">
-      <button className="adopt-button" onClick={handleAdoptFormVisibility}>
-        Adopt Request
+      <button
+        className={`adopt-button ${verified ? '' : 'disabled'}`} // Apply disabled class if verified is false
+        onClick={verified ? handleAdoptFormVisibility : null} // Disable click event if verified is false
+      >
+        {verified ? 'Adopt Request' : 'Not Available for Adoption'}
       </button>
       {isAdoptFormVisible && (
         <div className="modal-overlay">
