@@ -6,6 +6,7 @@ function AdoptionStatus() {
     const [adoptionRequests, setAdoptionRequests] = useState([]);
     const [loading, setLoading] = useState(true);
 
+    // Function to determine text color based on adoption status
     const getStatusColor = (status) => {
         const normalizedStatus = status.toLowerCase();
         switch (normalizedStatus) {
@@ -30,66 +31,69 @@ function AdoptionStatus() {
                         Authorization: `Bearer ${token}`
                     }
                 });
-                
+
                 // Filter adoption requests based on user_id
                 const filteredRequests = response.data.filter(request => request.user_id === userId);
-                
+
                 setAdoptionRequests(filteredRequests);
                 setLoading(false);
             } catch (error) {
                 console.error('Error fetching adoption requests:', error);
                 toast.error('Failed to fetch adoption requests');
-                setAdoptionRequests([]);
+                setAdoptionRequests([]); // Reset adoptionRequests state on error
                 setLoading(false);
             }
         };
 
         fetchAdoptionRequests();
-    }, []);
+    }, []); // Empty dependency array ensures this effect runs only once on component mount
 
     return (
-        <div className="h-screen flex flex-col justify-center items-center bg-gray-100">
+            <center>
             <div className="max-w-4xl w-full bg-white rounded-lg shadow-lg p-6">
                 <h1 className="text-center text-lg text-gray-700 mb-4 font-bold">Adoption Requests</h1>
                 {loading ? (
                     <p className="text-center text-sm text-gray-700 mb-4 font-bold">Loading...</p>
                 ) : (
-                    <div className="grid grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                         {adoptionRequests.length === 0 ? (
                             <p className="text-center col-span-3">No pending requests</p>
                         ) : (
                             adoptionRequests.map((request) => (
                                 <div key={request._id} className="border border-gray-300 rounded-lg p-4">
                                     {request.adoptionRequests && request.adoptionRequests.length > 0 ? (
-                                        <div className="flex flex-wrap">
-                                            {request.adoptionRequests[0].imageUrls.map((url, index) => (
+                                        <div className="flex flex-wrap justify-center">
+                                            {/* Display only the first image if available */}
+                                            {request.adoptionRequests[0].imageUrls.length > 0 ? (
                                                 <img
-                                                    key={index}
-                                                    src={`http://localhost:8000/uploads/${url}`}
-                                                    alt={`Pet Image ${index}`}
-                                                    className="max-w-full h-48 object-cover rounded-lg m-2"
+                                                    src={`http://localhost:8000/uploads/${request.adoptionRequests[0].imageUrls[0]}`}
+                                                    alt={`Pet Image`}
+                                                    className="max-w-full h-48 object-cover rounded-lg mb-2"
                                                 />
-                                            ))}
+                                            ) : (
+                                                <p className="text-center mb-2">No images available</p>
+                                            )}
                                         </div>
                                     ) : (
-                                        <p>No images available</p>
+                                        <p className="text-center mb-2">No images available</p>
                                     )}
                                     <p className={`${getStatusColor(request.status)} font-bold mb-2`}>
-                                        <strong className="text-black">Status:</strong> {request.status}
+                                       {request.status}
                                     </p>
-                                    <p className="text-xs"><strong>ID:</strong> {request._id}</p>
-                                    <p><strong>Name:</strong> {request.name}</p>
-                                    <p><strong>Contact Info:</strong> {request.contactInfo}</p>
-                                    <p><strong>Address:</strong> {request.address}</p>
-                                    <p><strong>Email:</strong> {request.email}</p>
-                                    <p><strong>Admin's Message:</strong> {request.adminMessage}</p>
+                                    <p className="text-xs text-left"><strong>ID:</strong> {request._id}</p>
+                                    <p className="text-left"><strong>Name:</strong> {request.name}</p>
+                                    <p className="text-left"><strong>Contact Info:</strong> {request.contactInfo}</p>
+                                    <p className="text-left"><strong>Address:</strong> {request.address}</p>
+                                    <p className="text-left"><strong>Email:</strong> {request.email}</p>
+                                    <p className="text-left"><strong>Admin's Message:</strong> {request.adminMessage}</p>
                                 </div>
                             ))
                         )}
                     </div>
                 )}
             </div>
-        </div>
+        </center>
+       
     );
 }
 

@@ -2,170 +2,162 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 
-function ArchivedRequests() {
+function AdoptionProcess() {
   const [adoptionrequests, setAdoptionRequests] = useState([]);
-  const [adoptionData, setadoptionData] = useState([]);
-
-
-  const [adminMessage, setAdminMessage]= useState([]);
-
-
-
-  const fetchImageData = async () => {
-    try {
-      const response = await axios.get('http://localhost:8000/api/pets/for/adoption');
-  
-      const sortedImages = response.data.sort((a, b) => {
-        const timeA = new Date(a.createdAt).getTime(); 
-        const timeB = new Date(b.createdAt).getTime(); 
-        return timeA - timeB; 
-      });
-  
-      setadoptionData(sortedImages);
-      
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-  };
-  useEffect(() => {
-    fetchImageData();
-  }, []);
-
+  const [adminMessage, setAdminMessage] = useState({});
+  const [selectedRequest, setSelectedRequest] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchAdoptionRequests = async () => {
       try {
         const response = await axios.get("http://localhost:8000/api/get/adoption/requests");
-        console.log(response);
-        // Filter adoption requests to exclude those with status "pending"
-        const filteredRequests = response.data.filter(request => request.status !== "pending" );
+        const filteredRequests = response.data.filter(request => request.status !== "pending");
         setAdoptionRequests(filteredRequests);
 
-        // Initialize admin messages state for each adoption request
+        // Initialize admin messages state
         const initialMessages = {};
         filteredRequests.forEach(request => {
-          initialMessages[request._id] = '';
+          initialMessages[request._id] = request.adminMessage || '';
         });
         setAdminMessage(initialMessages);
+        setIsLoading(false);
       } catch (error) {
         console.error('Error fetching adoption requests:', error);
+        toast.error('Failed to fetch adoption requests');
+        setIsLoading(false);
       }
     };
 
     fetchAdoptionRequests();
   }, []);
 
-  
-  const handleApprove = async (id) => {
-    try {
-      await axios.put(
-        `http://localhost:8000/api/adoption/request/approve/${id}`,
-        { adminMessage: adminMessage[id] }, 
-        { headers: { "Content-Type": "application/json" } } 
-      );
-      toast.success("Approved");
-      window.location.reload();
-    } catch (error) {
-      console.error("Error updating adoption request:", error);
-    }
+  const openModal = (request) => {
+    setSelectedRequest(request);
+    setIsModalOpen(true);
   };
-  
-  const handleDecline = async (id) => { 
-    try {
-      await axios.put(
-        `http://localhost:8000/api/adoption/request/decline/${id}`,
-        { adminMessage: adminMessage[id] }, 
-        { headers: { "Content-Type": "application/json" } } 
-      );
-      toast.warning("Declined");
-      window.location.reload();
-    } catch (error) {
-      console.error("Error updating adoption request", error);
-    }
+
+  const closeModal = () => {
+    setSelectedRequest(null);
+    setIsModalOpen(false);
   };
-  
+
+  const handleRestore = async (id) => {
+    
+  };
+
   return (
     <div className="overflow-x-auto">
-      <table className="min-w-full divide-y divide-gray-200">
-        <thead className="bg-gray-50">
-          <tr>
-            <th>Email</th>
-            <th>Name</th>
-            <th>Contact Number</th>
-            <th>Address</th>
-            <th>Status</th>
-            <th>Action</th>
-            <th>Request</th>
-          </tr>
-        </thead>
-        <tbody className="bg-white divide-y divide-gray-200">
-          {adoptionrequests && adoptionrequests.map((item) => (
-            <tr key={item._id}>
-              <td className="px-6 py-4 whitespace-nowrap">{item.email}</td>
-              <td className="px-6 py-4 whitespace-nowrap">{item.name}</td>
-              <td className="px-6 py-4 whitespace-nowrap">{item.contactInfo}</td>
-              <td className="px-6 py-4 whitespace-nowrap">{item.address}</td>
-              <td className="px-6 py-4 whitespace-nowrap">{item.status}</td>
-              <td className="px-6 py-4 whitespace-nowrap">
-                {/* Action buttons */}
-                <div className="flex flex-col items-center">
-                  {/* Input field for admin message */}
-                  <input
-                    type="text"
-                    value={adminMessage[item._id]} 
-                    onChange={(e) => setAdminMessage(prevState => ({ ...prevState, [item._id]: e.target.value }))} 
-                    placeholder="Enter message"
-                    className="mr-2 px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500"
-                  />
-                  <div className="flex mt-2">
-                    <button
-                      onClick={() => handleApprove(item._id)}
-                      className="mr-2 px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 focus:outline-none focus:bg-green-600"
-                    >
-                      Approve
-                    </button>
-                    <button
-                      onClick={() => handleDecline(item._id)}
-                      className="ml-2 px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 focus:outline-none focus:bg-red-600"
-                    >
-                      Decline
-                    </button>
-                  </div>
-
-                </div>
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap">
-              {adoptionData.map((group) => (
-                <div key={group._id} className="gallery-group px-6 py-4 whitespace-nowrap">
-                  <div className="information">
-                    <p><strong>Posted by:</strong> {group.user_email}</p>
-                    <p><strong>Caption:</strong> {group.images[0].caption}</p>
-                    <p><strong>Species:</strong> {group.images[0].species}</p>
-                    <p><strong>Breed:</strong> {group.images[0].breed}</p>
-                    <p><strong>Gender:</strong> {group.images[0].gender}</p>
-                    <p><strong>Age in months:</strong> {group.images[0].age}</p>
-                    <p><strong>Medical History:</strong> {group.images[0].medhistory} {group.images[0].others}</p>
-                  </div>
-                  <div className="images-wrapper">
-                    {group.images.map((image, index) => (
-                      <div key={index} className="gallery-image-container">
-                        <img 
-                          src={`http://localhost:8000/uploads/${image.imageUrls[0]}`}  // Assuming imageUrls is an array; use imageUrls[0] to access the first URL
-                          alt={image.caption}  // Use image.caption for alt text
-                          className="h-12 w-12 object-cover rounded-full"
-                        /> 
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ))}
-              </td>
+      {isLoading ? (
+        <p>Loading adoption requests...</p>
+      ) : adoptionrequests.length === 0 ? (
+        <p>No pending adoption requests.</p>
+      ) : (
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead className="bg-gray-50">
+            <tr>
+              <th>Email</th>
+              <th>Name</th>
+              <th>Contact Number</th>
+              <th>Address</th>
+              <th>Status</th>
+              <th>Action</th>
+              <th>View Details</th> {/* New column for button */}
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody className="bg-white divide-y divide-gray-200">
+            {adoptionrequests.map((item) => (
+              <tr key={item._id}>
+                <td className="px-6 py-4 whitespace-nowrap">{item.email}</td>
+                <td className="px-6 py-4 whitespace-nowrap">{item.name}</td>
+                <td className="px-6 py-4 whitespace-nowrap">{item.contactInfo}</td>
+                <td className="px-6 py-4 whitespace-nowrap">{item.address}</td>
+                <td className="px-6 py-4 whitespace-nowrap">{item.status}</td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <div className="flex flex-col items-center">
+                    <input
+                      type="text"
+                      value={adminMessage[item._id]}
+                      onChange={(e) =>
+                        setAdminMessage(prevState => ({
+                          ...prevState,
+                          [item._id]: e.target.value
+                        }))
+                      }
+                      placeholder="Enter message"
+                      className="mr-2 px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500"
+                    />
+                    <div className="flex mt-2">
+                      <button
+                        onClick={() => handleRestore(item._id)}
+                        className="px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 focus:outline-none focus:bg-orange-600"
+                      >
+                        Restore
+                      </button>
+                      
+                    </div>
+                  </div>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  {/* Button to open modal */}
+                  <button
+                    onClick={() => openModal(item)}
+                    className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600"
+                  >
+                    View Details
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+
+      {/* Modal for displaying adoption request details */}
+      {isModalOpen && selectedRequest && (
+        <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50">
+          <div className="bg-white p-6 rounded-md">
+            <h2 className="text-lg font-bold mb-4">Adoption Request Details</h2>
+            {/* Render adoption requests details */}
+            {selectedRequest.adoptionRequests.map((request) => (
+              <div key={request._id} className="mb-4">
+                <p><strong>Pet ID:</strong> {request._id}</p>
+                <p><strong>Breed:</strong> {request.breed}</p>
+                <p><strong>Specie:</strong> {request.species}</p>
+                <p><strong>Gender:</strong> {request.gender}</p>
+                <p><strong>Age:</strong> {request.age}</p>
+                <p><strong>Caption:</strong> {request.caption}</p>
+                <div className="flex flex-wrap justify-center">
+                    {request.imageUrls.length > 0 ? (
+                        request.imageUrls.map((imageUrl, index) => (
+                            <img
+                                key={index}
+                                src={`http://localhost:8000/uploads/${imageUrl}`}
+                                alt={`Pet Image ${index}`}
+                                className={`max-w-full ${request.imageUrls.length === 1 ? 'h-64' : 'h-40 sm:h-32 md:h-48'} object-cover rounded-lg m-2`}
+                            />
+                        ))
+                    ) : (
+                        <p className="text-center mb-2">No images available</p>
+                    )}
+                </div>
+
+
+
+              </div>
+            ))}
+            <button
+              onClick={closeModal}
+              className="mt-4 px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 focus:outline-none focus:bg-gray-400"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
-export default ArchivedRequests;
+export default AdoptionProcess;
