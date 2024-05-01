@@ -92,7 +92,7 @@ function AdoptionProcess() {
               <th>Address</th>
               <th>Status</th>
               <th>Action</th>
-              <th>View Details</th> {/* New column for button */}
+              <th>Requests</th> {/* New column for button */}
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
@@ -139,7 +139,7 @@ function AdoptionProcess() {
                     onClick={() => openModal(item)}
                     className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600"
                   >
-                    View Details
+                    View Request
                   </button>
                 </td>
               </tr>

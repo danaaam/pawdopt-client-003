@@ -5,7 +5,7 @@ import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import './AdoptButton.css';
 
-const AdoptButton = ({ imageUrl, petId, onAdoptionSubmitted, verified }) => {
+const AdoptButton = ({ imageUrl, petId, onAdoptionSubmitted, verified, petOwnerId }) => {
   const [isAdoptFormVisible, setIsAdoptFormVisible] = useState(false);
   const [name, setName] = useState('');
   const [address, setAddress] = useState('');
@@ -23,11 +23,14 @@ const AdoptButton = ({ imageUrl, petId, onAdoptionSubmitted, verified }) => {
     try {
       const token = localStorage.getItem('token');
       const verified = localStorage.getItem('verified');
+      const userId = localStorage.getItem('id'); // Retrieve user ID from local storage
+
       if (!token) {
         toast.error('You need to log in first, please log in');
         navigate('/signin');
         return;
       }
+
       if (!verified) {
         toast.error('Not yet verified, Click Ok to see Verification status');
         navigate('/valid');
@@ -43,17 +46,17 @@ const AdoptButton = ({ imageUrl, petId, onAdoptionSubmitted, verified }) => {
         imageUrl,
         adoptionRequests: [petId], // Include the petId in the adoption request data
       };
-  
+
       const response = await axios.post(
         'http://localhost:8000/api/adoption/request',
         adoptionData,
         {
           headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${token}`,
           },
         }
       );
-  
+
       if (response.status === 201) {
         toast.success('Successfully submitted a request');
         setIsAdoptFormVisible(false);
@@ -66,17 +69,26 @@ const AdoptButton = ({ imageUrl, petId, onAdoptionSubmitted, verified }) => {
       }
     } catch (error) {
       console.error('Error submitting adoption request:', error);
+      toast.error('Failed to submit adoption request. Please try again.');
     }
   };
-  
+
+  const isCurrentUserNotOwner = () => {
+    const userId = localStorage.getItem('id'); // Retrieve user ID from local storage
+
+    return userId !== petOwnerId;
+  };
+
   return (
     <div className="adoption-form">
-      <button
-        className={`adopt-button ${verified ? '' : 'disabled'}`} // Apply disabled class if verified is false
-        onClick={verified ? handleAdoptFormVisibility : null} // Disable click event if verified is false
-      >
-        {verified ? 'Adopt Request' : 'Not Available for Adoption'}
-      </button>
+      {isCurrentUserNotOwner() && (
+        <button
+          className={`adopt-button ${verified ? '' : 'disabled'}`}
+          onClick={verified ? handleAdoptFormVisibility : null}
+        >
+          {verified ? 'Adopt Request' : 'Not Available for Adoption'}
+        </button>
+      )}
       {isAdoptFormVisible && (
         <div className="modal-overlay">
           <div className="modal-content">

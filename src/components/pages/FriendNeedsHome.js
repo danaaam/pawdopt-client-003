@@ -147,6 +147,7 @@ function FriendNeedsHome() {
   const handleAdoptionSubmitted = () => {
     setFormSubmitted(true); // Set formSubmitted to true upon successful adoption submission
   };
+  
 
   return (
     <div className="bg-gray-100 min-h-screen py-8">
@@ -333,8 +334,10 @@ function FriendNeedsHome() {
                   imageUrl={item.imageUrls[0]}
                   petId={item._id}
                   onAdoptionSubmitted={handleAdoptionSubmitted}
-                  verified={verified} // Pass verified prop to AdoptButton
+                  verified={verified}
+                  petOwnerId={item.user_id} // Pass the pet's owner ID as a prop
                 />
+
               </div>
             </div>
           ))}
