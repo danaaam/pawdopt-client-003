@@ -15,7 +15,11 @@ const AdoptButton = ({ imageUrl, petId, onAdoptionSubmitted, verified, petOwnerI
   const [isRequestSubmitted, setIsRequestSubmitted] = useState(false);
 
   const handleAdoptFormVisibility = () => {
-    setIsAdoptFormVisible(!isAdoptFormVisible);
+    if (verified) {
+      setIsAdoptFormVisible(!isAdoptFormVisible);
+    } else {
+      toast.error('Your account is not verified');
+    }
   };
 
   const handleSubmitAdoptionRequest = async (event) => {
@@ -32,8 +36,7 @@ const AdoptButton = ({ imageUrl, petId, onAdoptionSubmitted, verified, petOwnerI
       }
 
       if (!verified) {
-        toast.error('Not yet verified, Click Ok to see Verification status');
-        navigate('/valid');
+        toast.error('Your account is not verified');
         return;
       }
 
@@ -75,7 +78,6 @@ const AdoptButton = ({ imageUrl, petId, onAdoptionSubmitted, verified, petOwnerI
 
   const isCurrentUserNotOwner = () => {
     const userId = localStorage.getItem('id'); // Retrieve user ID from local storage
-
     return userId !== petOwnerId;
   };
 
@@ -84,15 +86,16 @@ const AdoptButton = ({ imageUrl, petId, onAdoptionSubmitted, verified, petOwnerI
       {isCurrentUserNotOwner() && (
         <button
           className={`adopt-button ${verified ? '' : 'disabled'}`}
-          onClick={verified ? handleAdoptFormVisibility : null}
+          onClick={handleAdoptFormVisibility}
+          disabled={!verified} // Disable button if not verified
         >
-          {verified ? 'Adopt Request' : 'Not Available for Adoption'}
+          {verified ? 'Adopt Request' : 'Disabled'}
         </button>
       )}
       {isAdoptFormVisible && (
         <div className="modal-overlay">
           <div className="modal-content">
-            <h2>Adoption Form</h2>
+            <h2 className="form-title">Adoption Form</h2>
             <form onSubmit={handleSubmitAdoptionRequest}>
               <div className="form-group">
                 <label htmlFor="name">Name:</label>
@@ -102,6 +105,7 @@ const AdoptButton = ({ imageUrl, petId, onAdoptionSubmitted, verified, petOwnerI
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   required
+                  className="form-input"
                 />
               </div>
               <div className="form-group">
@@ -112,6 +116,7 @@ const AdoptButton = ({ imageUrl, petId, onAdoptionSubmitted, verified, petOwnerI
                   value={address}
                   onChange={(e) => setAddress(e.target.value)}
                   required
+                  className="form-input"
                 />
               </div>
               <div className="form-group">
@@ -122,6 +127,7 @@ const AdoptButton = ({ imageUrl, petId, onAdoptionSubmitted, verified, petOwnerI
                   value={contactInfo}
                   onChange={(e) => setContactInfo(e.target.value)}
                   required
+                  className="form-input"
                 />
               </div>
               <div className="form-group">
@@ -131,6 +137,7 @@ const AdoptButton = ({ imageUrl, petId, onAdoptionSubmitted, verified, petOwnerI
                   value={message}
                   placeholder="Optional"
                   onChange={(e) => setMessage(e.target.value)}
+                  className="form-textarea"
                 />
               </div>
               <div className="button-group">

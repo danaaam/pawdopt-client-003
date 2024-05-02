@@ -68,7 +68,7 @@ function AdoptionStatus() {
                                                 <img
                                                     src={`http://localhost:8000/uploads/${request.adoptionRequests[0].imageUrls[0]}`}
                                                     alt={`Pet Image`}
-                                                    className="max-w-full h-48 object-cover rounded-lg mb-2"
+                                                    className="size-48 object-cover rounded-lg mb-2"
                                                 />
                                             ) : (
                                                 <p className="text-center mb-2">No images available</p>

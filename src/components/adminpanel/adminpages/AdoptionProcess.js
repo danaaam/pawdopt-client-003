@@ -150,37 +150,38 @@ function AdoptionProcess() {
 
       {/* Modal for displaying adoption request details */}
       {isModalOpen && selectedRequest && (
-        <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50">
-          <div className="bg-white p-6 rounded-md">
-            <h2 className="text-lg font-bold mb-4">Adoption Request Details</h2>
-            {/* Render adoption requests details */}
-            {selectedRequest.adoptionRequests.map((request) => (
-              <div key={request._id} className="mb-4">
-                <p><strong>Pet ID:</strong> {request._id}</p>
-                <p><strong>Breed:</strong> {request.breed}</p>
-                <p><strong>Specie:</strong> {request.species}</p>
-                <p><strong>Gender:</strong> {request.gender}</p>
-                <p><strong>Age:</strong> {request.age}</p>
-                <p><strong>Caption:</strong> {request.caption}</p>
-                <div className="flex flex-wrap justify-center">
-                    {request.imageUrls.length > 0 ? (
-                        request.imageUrls.map((imageUrl, index) => (
-                            <img
-                                key={index}
-                                src={`http://localhost:8000/uploads/${imageUrl}`}
-                                alt={`Pet Image ${index}`}
-                                className={`max-w-full ${request.imageUrls.length === 1 ? 'h-64' : 'h-40 sm:h-32 md:h-48'} object-cover rounded-lg m-2`}
-                            />
-                        ))
-                    ) : (
-                        <p className="text-center mb-2">No images available</p>
-                    )}
-                </div>
+  <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50">
+    <div className="bg-white p-6 rounded-md" style={{ width: '500px' }}>
+      <h2 className="text-lg font-bold mb-4">Adoption Request Details</h2>
+      
+      {/* Iterate over each adoption request */}
+      {selectedRequest.adoptionRequests.map((request) => (
+        <div key={request._id} className="mb-4">
+          <p ><strong>Request ID:</strong> {selectedRequest._id}</p> {/* Display parent pet's _id */}
+          <p ><strong>Pet ID:</strong> {request._id}</p>
+          <p><strong>Breed:</strong> {request.breed}</p>
+          <p><strong>Species:</strong> {request.species}</p>
+          <p><strong>Gender:</strong> {request.gender}</p>
+          <p><strong>Age:</strong> {request.age}</p>
+          <p><strong>Caption:</strong> {request.caption}</p>
 
-
-
-              </div>
-            ))}
+          {/* Display images if available */}
+          <div className="flex flex-wrap justify-center">
+            {request.imageUrls.length > 0 ? (
+              request.imageUrls.map((imageUrl, index) => (
+                <img
+                  key={index}
+                  src={`http://localhost:8000/uploads/${imageUrl}`}
+                  alt={`Pet Image ${index}`}
+                  className={` ${request.imageUrls.length === 1 ? 'size-48' : 'size-24'} object-cover rounded-lg m-2`}
+                />
+              ))
+            ) : (
+              <p className="text-center mb-2">No images available</p>
+            )}
+          </div>
+        </div>
+      ))}
             <button
               onClick={closeModal}
               className="mt-4 px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 focus:outline-none focus:bg-gray-400"
