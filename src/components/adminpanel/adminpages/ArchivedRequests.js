@@ -14,6 +14,10 @@ function AdoptionProcess() {
       try {
         const response = await axios.get("http://localhost:8000/api/get/adoption/requests");
         const filteredRequests = response.data.filter(request => request.status !== "pending");
+
+        // Sort requests by updatedAt in descending order
+        filteredRequests.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+
         setAdoptionRequests(filteredRequests);
 
         // Initialize admin messages state
@@ -44,7 +48,21 @@ function AdoptionProcess() {
   };
 
   const handleRestore = async (id) => {
-    
+    try {
+      await axios.put(
+        `http://localhost:8000/api/adoption/request/restore/${id}`,
+        { adminMessage: adminMessage[id] },
+        { headers: { "Content-Type": "application/json" } }
+      );
+
+      // Additional logic...
+
+      toast.warning("Restored");
+      window.location.reload();
+    } catch (error) {
+      console.error("Error updating adoption request:", error);
+      toast.error("Failed to update adoption request");
+    }
   };
 
   return (
@@ -122,8 +140,8 @@ function AdoptionProcess() {
             {/* Render adoption requests details */}
             {selectedRequest.adoptionRequests.map((request) => (
               <div key={request._id} className="mb-4">
-                <p ><strong>Request ID:</strong> {selectedRequest._id}</p> {/* Display parent pet's _id */}
-                <p ><strong>Pet ID:</strong> {request._id}</p>
+                <p><strong>Request ID:</strong> {selectedRequest._id}</p>
+                <p><strong>Pet ID:</strong> {request._id}</p>
                 <p><strong>Breed:</strong> {request.breed}</p>
                 <p><strong>Species:</strong> {request.species}</p>
                 <p><strong>Gender:</strong> {request.gender}</p>
@@ -145,9 +163,6 @@ function AdoptionProcess() {
                     <p className="text-center mb-2">No images available</p>
                   )}
                 </div>
-
-
-
               </div>
             ))}
             <button
