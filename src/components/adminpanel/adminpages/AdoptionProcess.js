@@ -13,13 +13,13 @@ function AdoptionProcess() {
     const fetchAdoptionRequests = async () => {
       try {
         const response = await axios.get("http://localhost:8000/api/get/adoption/requests");
-        const filteredRequests = response.data.filter(request => request.status === "pending");
+        const filteredRequests = response.data.filter((request) => request.status === "pending");
         setAdoptionRequests(filteredRequests);
 
         // Initialize admin messages state
         const initialMessages = {};
-        filteredRequests.forEach(request => {
-          initialMessages[request._id] = request.adminMessage || '';
+        filteredRequests.forEach((request) => {
+          initialMessages[request._id] = request.adminMessage || "";
         });
         setAdminMessage(initialMessages);
         setIsLoading(false);
@@ -45,13 +45,19 @@ function AdoptionProcess() {
 
   const handleApprove = async (id) => {
     try {
-      await axios.put(
-        `http://localhost:8000/api/adoption/request/approve/${id}`,
-        { adminMessage: adminMessage[id] },
-        { headers: { "Content-Type": "application/json" } }
-      );
-      toast.success("Approved");
-      window.location.reload();
+      // Display admin message in confirmation dialog
+      const confirmMessage = adminMessage[id] || "No admin message provided.";
+      const confirmApprove = window.confirm(`Are you sure you want to approve?\nAdmin Message: ${confirmMessage}`);
+      
+      if (confirmApprove) {
+        await axios.put(
+          `http://localhost:8000/api/adoption/request/approve/${id}`,
+          { adminMessage: adminMessage[id] },
+          { headers: { "Content-Type": "application/json" } }
+        );
+        toast.success("Approved");
+        window.location.reload(); // Reload the page after approval
+      }
     } catch (error) {
       console.error("Error updating adoption request:", error);
       toast.error("Failed to update adoption request");
@@ -60,16 +66,22 @@ function AdoptionProcess() {
 
   const handleDecline = async (id) => {
     try {
-      await axios.put(
-        `http://localhost:8000/api/adoption/request/decline/${id}`,
-        { adminMessage: adminMessage[id] },
-        { headers: { "Content-Type": "application/json" } }
-      );
-
-      // Additional logic...
-
-      toast.warning("Declined");
-      window.location.reload();
+      // Display admin message in confirmation dialog
+      const confirmMessage = adminMessage[id] || "No admin message provided.";
+      const confirmDecline = window.confirm(`Are you sure you want to decline?\nAdmin Message: ${confirmMessage}`);
+      
+      if (confirmDecline) {
+        await axios.put(
+          `http://localhost:8000/api/adoption/request/decline/${id}`,
+          { adminMessage: adminMessage[id] },
+          { headers: { "Content-Type": "application/json" } }
+        );
+  
+        // Additional logic...
+  
+        toast.warning("Declined");
+        window.location.reload(); // Reload the page after decline
+      }
     } catch (error) {
       console.error("Error updating adoption request:", error);
       toast.error("Failed to update adoption request");
@@ -107,15 +119,11 @@ function AdoptionProcess() {
                   <div className="flex flex-col items-center">
                     <input
                       type="text"
-                      value={adminMessage[item._id]}
-                      onChange={(e) =>
-                        setAdminMessage(prevState => ({
-                          ...prevState,
-                          [item._id]: e.target.value
-                        }))
-                      }
+                      value={adminMessage[item._id] || ""}
                       placeholder="Enter message"
+                      maxLength={200} // Set maxLength attribute to enforce limit
                       className="mr-2 px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500"
+                      onChange={(e) => setAdminMessage((prevState) => ({ ...prevState, [item._id]: e.target.value }))}
                     />
                     <div className="flex mt-2">
                       <button
@@ -150,38 +158,38 @@ function AdoptionProcess() {
 
       {/* Modal for displaying adoption request details */}
       {isModalOpen && selectedRequest && (
-  <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50">
-    <div className="bg-white p-6 rounded-md" style={{ width: '500px' }}>
-      <h2 className="text-lg font-bold mb-4">Adoption Request Details</h2>
-      
-      {/* Iterate over each adoption request */}
-      {selectedRequest.adoptionRequests.map((request) => (
-        <div key={request._id} className="mb-4">
-          <p ><strong>Request ID:</strong> {selectedRequest._id}</p> {/* Display parent pet's _id */}
-          <p ><strong>Pet ID:</strong> {request._id}</p>
-          <p><strong>Breed:</strong> {request.breed}</p>
-          <p><strong>Species:</strong> {request.species}</p>
-          <p><strong>Gender:</strong> {request.gender}</p>
-          <p><strong>Age:</strong> {request.age}</p>
-          <p><strong>Caption:</strong> {request.caption}</p>
+        <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50">
+          <div className="bg-white p-6 rounded-md" style={{ width: '500px' }}>
+            <h2 className="text-lg font-bold mb-4">Adoption Request Details</h2>
+            
+            {/* Iterate over each adoption request */}
+            {selectedRequest.adoptionRequests.map((request) => (
+              <div key={request._id} className="mb-4">
+                <p><strong>Request ID:</strong> {selectedRequest._id}</p>
+                <p><strong>Pet ID:</strong> {request._id}</p>
+                <p><strong>Breed:</strong> {request.breed}</p>
+                <p><strong>Species:</strong> {request.species}</p>
+                <p><strong>Gender:</strong> {request.gender}</p>
+                <p><strong>Age:</strong> {request.age} months old</p>
+                <p><strong>Caption:</strong> {request.caption}</p>
 
-          {/* Display images if available */}
-          <div className="flex flex-wrap justify-center">
-            {request.imageUrls.length > 0 ? (
-              request.imageUrls.map((imageUrl, index) => (
-                <img
-                  key={index}
-                  src={`http://localhost:8000/uploads/${imageUrl}`}
-                  alt={`Pet Image ${index}`}
-                  className={` ${request.imageUrls.length === 1 ? 'size-48' : 'size-24'} object-cover rounded-lg m-2`}
-                />
-              ))
-            ) : (
-              <p className="text-center mb-2">No images available</p>
-            )}
-          </div>
-        </div>
-      ))}
+                {/* Display images if available */}
+                <div className="flex flex-wrap justify-center">
+                  {request.imageUrls.length > 0 ? (
+                    request.imageUrls.map((imageUrl, index) => (
+                      <img
+                        key={index}
+                        src={`http://localhost:8000/uploads/${imageUrl}`}
+                        alt={`Pet Image ${index}`}
+                        className={` ${request.imageUrls.length === 1 ? 'size-48' : 'size-24'} object-cover rounded-lg m-2`}
+                      />
+                    ))
+                  ) : (
+                    <p className="text-center mb-2">No images available</p>
+                  )}
+                </div>
+              </div>
+            ))}
             <button
               onClick={closeModal}
               className="mt-4 px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 focus:outline-none focus:bg-gray-400"

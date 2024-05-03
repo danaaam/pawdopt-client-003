@@ -95,8 +95,8 @@ function AdoptionStatus() {
                                             <p className="text-center mb-2">No images available</p>
                                         )}
                                     </div>
-                                    <p className="text-xs text-left"><strong>R#:</strong> <span className="text-xs font-medium text-green-400">{request._id}</span></p>
-                                    <p className="text-xs text-left"><strong>Pet#:</strong> <span className="text-xs font-medium text-green-400">{request.adoptionRequests[0]._id}</span></p>
+                                    <p className="text-xs text-left"><strong>R#:</strong> <span>{request._id}</span></p>
+                                    <p className="text-xs text-left"><strong>Pet#:</strong> <span>{request.adoptionRequests[0]._id}</span></p>
                                     <p className={`${getStatusColor(request.status)} font-bold m-2`}>
                                     {request.status}
                                     </p>

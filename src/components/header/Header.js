@@ -2,8 +2,7 @@ import { FaPaw, FaCog } from "react-icons/fa";
 import { FaLocationArrow } from "react-icons/fa6";
 
 import "./Header.css";
-import { Link, useNavigate } from "react-router-dom";
-import { useEffect } from "react";
+import { Link, useNavigate, useHistory } from "react-router-dom";
 
 export const Header = () => {
   const isLoggedIn = localStorage.getItem("token", "role");
@@ -18,14 +17,9 @@ export const Header = () => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("role");
-    localStorage.removeItem("email");
-    localStorage.removeItem("id");
-    localStorage.removeItem("verified");
-    localStorage.removeItem("role");
-    window.localStorage.removeItem("isLoggedin"); 
-    navigate("/");
+    localStorage.clear()
+    navigate("/signin");
+    navigate("/signin");
   };
 
   const handleClickUserstatus = () => {

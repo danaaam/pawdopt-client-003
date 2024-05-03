@@ -145,7 +145,7 @@ function AdoptionProcess() {
                 <p><strong>Breed:</strong> {request.breed}</p>
                 <p><strong>Species:</strong> {request.species}</p>
                 <p><strong>Gender:</strong> {request.gender}</p>
-                <p><strong>Age:</strong> {request.age}</p>
+                <p><strong>Age:</strong> {request.age} months old</p>
                 <p><strong>Caption:</strong> {request.caption}</p>
 
                 {/* Display images if available */}

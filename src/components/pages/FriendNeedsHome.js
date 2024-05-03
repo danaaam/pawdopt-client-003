@@ -314,7 +314,7 @@ function FriendNeedsHome() {
               />
               <div className="mt-4">
               <p className="text-xs text-left"><strong>Pet#:</strong> <span className="text-xs font-medium text-green-400">{item._id}</span></p>
-                <p className="text-sm text-gray-600"><span style={{ fontWeight: 'bold' }}></span> "{item.caption}"</p>
+                <p className="text-sm text-gray-600 m-3">"{item.caption}"</p>
                 <p className="text-sm text-gray-600"><span style={{ fontWeight: 'bold' }}>Species:</span> {item.species}</p>
                 <p className="text-sm text-gray-600"><span style={{ fontWeight: 'bold' }}>Breed:</span> {item.breed}</p>
                 <p className="text-sm text-gray-600"><span style={{ fontWeight: 'bold' }}>Gender:</span> {item.gender}</p>
