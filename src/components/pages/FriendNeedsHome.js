@@ -313,12 +313,12 @@ function FriendNeedsHome() {
                 className="w-full h-48 object-cover rounded-lg"
               />
               <div className="mt-4">
-                <p className="text-xs font-medium text-green-400"> {item._id}</p>
-                <p className="text-sm text-gray-600"><span style={{ fontWeight: 'bold' }}>Caption:</span> {item.caption}</p>
+              <p className="text-xs text-left"><strong>Pet#:</strong> <span className="text-xs font-medium text-green-400">{item._id}</span></p>
+                <p className="text-sm text-gray-600"><span style={{ fontWeight: 'bold' }}></span> "{item.caption}"</p>
                 <p className="text-sm text-gray-600"><span style={{ fontWeight: 'bold' }}>Species:</span> {item.species}</p>
                 <p className="text-sm text-gray-600"><span style={{ fontWeight: 'bold' }}>Breed:</span> {item.breed}</p>
                 <p className="text-sm text-gray-600"><span style={{ fontWeight: 'bold' }}>Gender:</span> {item.gender}</p>
-                <p className="text-sm text-gray-600"><span style={{ fontWeight: 'bold' }}>Age in months:</span> {item.age}</p>
+                <p className="text-sm text-gray-600"><span style={{ fontWeight: 'bold' }}>Age:</span> {item.age} months old</p>
                 <p className="text-sm text-gray-600">
                   <span style={{ fontWeight: 'bold' }}>Medical History:</span>{" "}
                   {item.medhistory.length > 0 ? (

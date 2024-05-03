@@ -6,7 +6,35 @@ function AdoptionStatus() {
     const [adoptionRequests, setAdoptionRequests] = useState([]);
     const [loading, setLoading] = useState(true);
 
-    // Function to determine text color based on adoption status
+    // Define the fetchAdoptionRequests function
+    const fetchAdoptionRequests = async () => {
+        try {
+            const token = localStorage.getItem('token');
+            const userId = localStorage.getItem('id');
+            const response = await axios.get('http://localhost:8000/api/get/adoption/requests', {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+
+            // Filter adoption requests based on user_id
+            const filteredRequests = response.data.filter(request => request.user_id === userId);
+
+            setAdoptionRequests(filteredRequests);
+            setLoading(false);
+        } catch (error) {
+            console.error('Error fetching adoption requests:', error);
+            toast.error('Failed to fetch adoption requests');
+            setAdoptionRequests([]);
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        // Call fetchAdoptionRequests when the component mounts
+        fetchAdoptionRequests();
+    }, []); // Empty dependency array ensures this effect runs only once on component mount
+
     const getStatusColor = (status) => {
         const normalizedStatus = status.toLowerCase();
         switch (normalizedStatus) {
@@ -21,35 +49,30 @@ function AdoptionStatus() {
         }
     };
 
-    useEffect(() => {
-        const fetchAdoptionRequests = async () => {
+    const handleCancelRequest = async (id) => {
+        const token = localStorage.getItem('token');
+        const confirmCancel = window.confirm('Are you sure you want to cancel this adoption request?');
+
+        if (confirmCancel) {
             try {
-                const token = localStorage.getItem('token');
-                const userId = localStorage.getItem('id'); // Assuming user_id is stored in localStorage
-                const response = await axios.get('http://localhost:8000/api/get/adoption/requests', {
+                await axios.delete(`http://localhost:8000/api/cancel/adoption/request/${id}`, {
                     headers: {
                         Authorization: `Bearer ${token}`
                     }
                 });
 
-                // Filter adoption requests based on user_id
-                const filteredRequests = response.data.filter(request => request.user_id === userId);
-
-                setAdoptionRequests(filteredRequests);
-                setLoading(false);
+                // After successful cancellation, refetch adoption requests
+                fetchAdoptionRequests();
+                toast.success('Adoption request canceled successfully');
             } catch (error) {
-                console.error('Error fetching adoption requests:', error);
-                toast.error('Failed to fetch adoption requests');
-                setAdoptionRequests([]); // Reset adoptionRequests state on error
-                setLoading(false);
+                console.error('Error canceling adoption request:', error);
+                toast.error('Failed to cancel adoption request');
             }
-        };
-
-        fetchAdoptionRequests();
-    }, []); // Empty dependency array ensures this effect runs only once on component mount
+        }
+    };
 
     return (
-            <center>
+        <center>
             <div className="max-w-4xl w-full bg-white rounded-lg shadow-lg p-6">
                 <h1 className="text-center text-lg text-gray-700 mb-4 font-bold">Adoption Requests</h1>
                 {loading ? (
@@ -60,32 +83,37 @@ function AdoptionStatus() {
                             <p className="text-center col-span-3">No pending requests</p>
                         ) : (
                             adoptionRequests.map((request) => (
-                                <div key={request._id} className="border border-gray-300 rounded-lg p-4">
-                                    {request.adoptionRequests && request.adoptionRequests.length > 0 ? (
-                                        <div className="flex flex-wrap justify-center">
-                                            {/* Display only the first image if available */}
-                                            {request.adoptionRequests[0].imageUrls.length > 0 ? (
-                                                <img
-                                                    src={`http://localhost:8000/uploads/${request.adoptionRequests[0].imageUrls[0]}`}
-                                                    alt={`Pet Image`}
-                                                    className="size-48 object-cover rounded-lg mb-2"
-                                                />
-                                            ) : (
-                                                <p className="text-center mb-2">No images available</p>
-                                            )}
-                                        </div>
-                                    ) : (
-                                        <p className="text-center mb-2">No images available</p>
-                                    )}
-                                    <p className={`${getStatusColor(request.status)} font-bold mb-2`}>
-                                       {request.status}
+                                <div key={request._id} className="bg-gray-50 border border-gray-300 rounded-lg p-4">
+                                    <div className="flex flex-wrap justify-center">
+                                        {request.adoptionRequests && request.adoptionRequests.length > 0 ? (
+                                            <img
+                                                src={`http://localhost:8000/uploads/${request.adoptionRequests[0].imageUrls[0]}`}
+                                                alt={`Pet Image`}
+                                                className="w-full h-48 object-cover rounded-lg mb-2"
+                                            />
+                                        ) : (
+                                            <p className="text-center mb-2">No images available</p>
+                                        )}
+                                    </div>
+                                    <p className="text-xs text-left"><strong>R#:</strong> <span className="text-xs font-medium text-green-400">{request._id}</span></p>
+                                    <p className="text-xs text-left"><strong>Pet#:</strong> <span className="text-xs font-medium text-green-400">{request.adoptionRequests[0]._id}</span></p>
+                                    <p className={`${getStatusColor(request.status)} font-bold m-2`}>
+                                    {request.status}
                                     </p>
-                                    <p className="text-xs text-left"><strong>ID:</strong> {request._id}</p>
-                                    <p className="text-left"><strong>Name:</strong> {request.name}</p>
-                                    <p className="text-left"><strong>Contact Info:</strong> {request.contactInfo}</p>
-                                    <p className="text-left"><strong>Address:</strong> {request.address}</p>
-                                    <p className="text-left"><strong>Email:</strong> {request.email}</p>
-                                    <p className="text-left"><strong>Admin's Message:</strong> {request.adminMessage}</p>
+                                    <p className="text-left"><strong className='text-xs'>Name:</strong> {request.name}</p>
+                                    <p className="text-left"><strong className='text-xs'>Contact Info:</strong> {request.contactInfo}</p>
+                                    <p className="text-left"><strong className='text-xs'>Address:</strong> {request.address}</p>
+                                    <p className="text-left"><strong className='text-xs'>Email:</strong> {request.email}</p>
+                                    <p className="text-left bg-slate-300 pt-0 pb-1 pl-1 pr-1"><strong className='text-xs'>Admin's Message:</strong><br/> {request.adminMessage}</p>
+                                    {request.status === 'pending' && (
+                                        <button
+                                        className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mt-4 float-left"
+                                        onClick={() => handleCancelRequest(request._id)}
+                                    >
+                                        Cancel Request
+                                    </button>
+                                    
+                                    )}
                                 </div>
                             ))
                         )}
@@ -93,7 +121,6 @@ function AdoptionStatus() {
                 )}
             </div>
         </center>
-       
     );
 }
 
