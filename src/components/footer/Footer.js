@@ -8,8 +8,8 @@ import { FaPaw } from "react-icons/fa";
 import { Link } from "react-router-dom";
 
 function Footer() {
-  const address = "Bonuan Binloc Sitio America 336, Dagupan City";
-  const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+  const address = "Pantal Brg, 2400 Dagupan City, Philippines 2400 Dagupan City, Philippines";
+  const googleMapsUrl = `https://www.google.com/maps/dir/14.7528517,121.0852374/16.0509812,120.3408674/@16.0508699,120.3406228,20z/data=!4m4!4m3!1m1!4e1!1m0?entry=ttu(
     address
   )}`;
 
