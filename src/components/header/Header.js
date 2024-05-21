@@ -18,8 +18,7 @@ export const Header = () => {
 
   const handleLogout = () => {
     localStorage.clear()
-    navigate("/signin");
-    navigate("/signin");
+    navigate("/");
   };
 
   const handleClickUserstatus = () => {
