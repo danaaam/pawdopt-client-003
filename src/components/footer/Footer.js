@@ -40,15 +40,15 @@ function Footer() {
         <span className="inline-flex sm:ml-auto sm:mt-0 mt-4 justify-center sm:justify-start text-white">
           <a href="#!" className="text-white" onClick={() => handleClick('paypal')}>
             <BsPaypal size={30} />
-            {showNumbers.paypal && <span className="ml-1">09168750082</span>}
+            {showNumbers.paypal && <span className="ml-1">09502492588</span>}
           </a>
           <a href="#!" className="ml-3 text-white" onClick={() => handleClick('letterG')}>
             <TbSquareRoundedLetterG size={30} />
-            {showNumbers.letterG && <span className="ml-1">09168750082</span>}
+            {showNumbers.letterG && <span className="ml-1">09502492588</span>}
           </a>
           <a href="#!" className="ml-3 text-white" onClick={() => handleClick('telephone')}>
             <BsFillTelephoneFill size={30} />
-            {showNumbers.telephone && <span className="ml-1">0+63-2-8123-4567.</span>}
+            {showNumbers.telephone && <span className="ml-1">09502492588.</span>}
           </a>
           <a href={gmailUrl} target="_blank" rel="noopener noreferrer" className="ml-3 text-white">
             <AiFillMail size={30} /> 
