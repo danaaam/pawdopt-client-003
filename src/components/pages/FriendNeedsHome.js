@@ -118,6 +118,30 @@ function FriendNeedsHome() {
     }
   };
 
+  const handleDeletePet = async (petId) => {
+    try {
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        toast.error("You need to log in first, please log in");
+        navigate("/signin");
+        return;
+      }
+
+      await axios.delete(`http://localhost:8000/api/user/gallery/${petId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      toast.success("Pet deleted successfully");
+      setUpdateCount(updateCount + 1); // Trigger a re-fetch of the gallery
+    } catch (error) {
+      console.error("Error deleting pet:", error);
+      toast.error("Error deleting pet");
+    }
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -147,7 +171,9 @@ function FriendNeedsHome() {
   const handleAdoptionSubmitted = () => {
     setFormSubmitted(true); // Set formSubmitted to true upon successful adoption submission
   };
-  
+
+  // Get user ID from local storage
+  const userId = localStorage.getItem("id");
 
   return (
     <div className="bg-gray-100 min-h-screen py-8">
@@ -313,7 +339,7 @@ function FriendNeedsHome() {
                 className="w-full h-48 object-cover rounded-lg"
               />
               <div className="mt-4">
-              <p className="text-xs text-left"><strong>Pet#:</strong> <span className="text-xs font-medium text-green-400">{item._id}</span></p>
+                <p className="text-xs text-left"><strong>Pet#:</strong> <span className="text-xs font-medium text-green-400">{item._id}</span></p>
                 <p className="text-sm text-gray-600 m-3">"{item.caption}"</p>
                 <p className="text-sm text-gray-600"><span style={{ fontWeight: 'bold' }}>Species:</span> {item.species}</p>
                 <p className="text-sm text-gray-600"><span style={{ fontWeight: 'bold' }}>Breed:</span> {item.breed}</p>
@@ -330,14 +356,23 @@ function FriendNeedsHome() {
                     item.others
                   )}
                 </p>
-                <AdoptButton
-                  imageUrl={item.imageUrls[0]}
-                  petId={item._id}
-                  onAdoptionSubmitted={handleAdoptionSubmitted}
-                  verified={verified}
-                  petOwnerId={item.user_id} // Pass the pet's owner ID as a prop
-                />
-
+                <div className="flex justify-between items-center mt-4">
+                  <AdoptButton
+                    imageUrl={item.imageUrls[0]}
+                    petId={item._id}
+                    onAdoptionSubmitted={handleAdoptionSubmitted}
+                    verified={verified}
+                    petOwnerId={item.user_id} // Pass the pet's owner ID as a prop
+                  />
+                  {userId === item.user_id && (
+                    <button
+                      onClick={() => handleDeletePet(item._id)}
+                      className="ml-4 px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 focus:outline-none focus:ring focus:ring-red-500 focus:ring-opacity-50"
+                    >
+                      Delete
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
           ))}
