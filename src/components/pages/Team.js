@@ -32,7 +32,7 @@ const Team = () => {
                 className="mb-4 inline-block h-52 w-full object-cover"
               />
               <p className="font-bold">Dana Abegail Manuel</p>
-              <p className="text-sm text-[#636262]">Executive Director</p>
+              <p className="text-sm text-[#636262]"></p>
             </li>
             <li className="mx-auto flex max-w-xs flex-col items-center gap-4 px-8 py-6 text-center">
               <img
@@ -42,7 +42,7 @@ const Team = () => {
               />
               <p className="font-bold">Al Leonard Ballesteros</p>
               <p className="text-sm text-[#636262]">
-                Client Services Representative
+                
               </p>
             </li>
             <li className="mx-auto flex max-w-xs flex-col items-center gap-4 px-8 py-6 text-center">
@@ -52,7 +52,7 @@ const Team = () => {
                 className="mb-4 inline-block h-52 w-full object-cover"
               />
               <p className="font-bold">Andrei Valencirina</p>
-              <p className="text-sm text-[#636262]">Volunteer Coordinator</p>
+              <p className="text-sm text-[#636262]"></p>
             </li>
             <li className="mx-auto flex max-w-xs flex-col items-center gap-4 px-8 py-6 text-center">
               <img
@@ -61,7 +61,7 @@ const Team = () => {
                 className="mb-4 inline-block h-52 w-full object-cover"
               />
               <p className="font-bold">Kc Rose Calaguio</p>
-              <p className="text-sm text-[#636262]">Finance</p>
+              <p className="text-sm text-[#636262]"></p>
             </li>
           </ul>
         </div>
