@@ -60,12 +60,12 @@ function FriendNeedsHome() {
   };
 
   const handleButtonClick = () => {
-    const isLoggedIn = localStorage.getItem('token');
+    const isLoggedIn = localStorage.getItem("token");
     if (isLoggedIn) {
       setIsFormVisible(!isFormVisible);
     } else {
       toast.error("You need to login first");
-      navigate('/signin')
+      navigate("/signin");
     }
   };
 
@@ -85,8 +85,15 @@ function FriendNeedsHome() {
         navigate("/signin");
         return;
       }
-      
-      if (!selectedImage || !caption || !breed || !gender || !age || medhistory.length === 0) {
+
+      if (
+        !selectedImage ||
+        !caption ||
+        !breed ||
+        !gender ||
+        !age ||
+        medhistory.length === 0
+      ) {
         toast.error("All fields are required");
         return;
       }
@@ -145,9 +152,17 @@ function FriendNeedsHome() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get("http://localhost:8000/api/user/gallery");
-        const sortedPets = response.data.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
-        const updatedData = sortedPets.map((image) => ({ ...image, isAdoptFormVisible: false }));
+        const response = await axios.get(
+          "http://localhost:8000/api/user/gallery"
+        );
+        const sortedPets = response.data.sort(
+          (a, b) =>
+            new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+        );
+        const updatedData = sortedPets.map((image) => ({
+          ...image,
+          isAdoptFormVisible: false,
+        }));
         setuserGalleryData(updatedData);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -159,12 +174,12 @@ function FriendNeedsHome() {
   }, [updateCount, formSubmitted]);
 
   const handleSetVerified = () => {
-    const isVerified = localStorage.getItem('verified');
+    const isVerified = localStorage.getItem("verified");
     if (isVerified !== null) {
-      const verifiedStatus = isVerified === 'true';
+      const verifiedStatus = isVerified === "true";
       setVerified(verifiedStatus);
     } else {
-      console.log('Verification status not found in local storage');
+      console.log("Verification status not found in local storage");
     }
   };
 
@@ -174,16 +189,21 @@ function FriendNeedsHome() {
 
   // Get user ID from local storage
   const userId = localStorage.getItem("id");
+  const role = localStorage.getItem("role");
 
   return (
     <div className="bg-gray-100 min-h-screen py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h1 className="text-3xl font-extrabold text-gray-900">Pets Available to Adopt</h1>
+        <h1 className="text-3xl font-extrabold text-gray-900">
+          Pets Available to Adopt
+        </h1>
         <div className="mt-8 flex justify-end">
           <button
             onClick={() => handleButtonClick()}
             className={`px-4 py-2 rounded-md ${
-              !verified ? 'bg-gray-400 text-white cursor-not-allowed' : 'bg-green-500 text-white hover:bg-green-600'
+              !verified
+                ? "bg-gray-400 text-white cursor-not-allowed"
+                : "bg-green-500 text-white hover:bg-green-600"
             } transition duration-300`}
             disabled={!verified}
           >
@@ -194,7 +214,9 @@ function FriendNeedsHome() {
       {isFormVisible && (
         <div className="mt-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="bg-white p-6 rounded-lg shadow-md">
-            <h3 className="text-lg font-semibold mb-4">Pets for Adoption Form</h3>
+            <h3 className="text-lg font-semibold mb-4">
+              Pets for Adoption Form
+            </h3>
             <form onSubmit={handleAddToGallery}>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <label className="block">
@@ -248,7 +270,9 @@ function FriendNeedsHome() {
                     onChange={handleEditGender}
                     required
                   >
-                    <option value="" disabled>Select Gender</option>
+                    <option value="" disabled>
+                      Select Gender
+                    </option>
                     <option value="male">Male</option>
                     <option value="female">Female</option>
                   </select>
@@ -339,18 +363,35 @@ function FriendNeedsHome() {
                 className="w-full h-48 object-cover rounded-lg"
               />
               <div className="mt-4">
-                <p className="text-xs text-left"><strong>Pet#:</strong> <span className="text-xs font-medium text-green-400">{item._id}</span></p>
+                <p className="text-xs text-left">
+                  <strong>Pet#:</strong>{" "}
+                  <span className="text-xs font-medium text-green-400">
+                    {item._id}
+                  </span>
+                </p>
                 <p className="text-sm text-gray-600 m-3">"{item.caption}"</p>
-                <p className="text-sm text-gray-600"><span style={{ fontWeight: 'bold' }}>Species:</span> {item.species}</p>
-                <p className="text-sm text-gray-600"><span style={{ fontWeight: 'bold' }}>Breed:</span> {item.breed}</p>
-                <p className="text-sm text-gray-600"><span style={{ fontWeight: 'bold' }}>Gender:</span> {item.gender}</p>
-                <p className="text-sm text-gray-600"><span style={{ fontWeight: 'bold' }}>Age:</span> {item.age} months old</p>
                 <p className="text-sm text-gray-600">
-                  <span style={{ fontWeight: 'bold' }}>Medical History:</span>{" "}
+                  <span style={{ fontWeight: "bold" }}>Species:</span>{" "}
+                  {item.species}
+                </p>
+                <p className="text-sm text-gray-600">
+                  <span style={{ fontWeight: "bold" }}>Breed:</span>{" "}
+                  {item.breed}
+                </p>
+                <p className="text-sm text-gray-600">
+                  <span style={{ fontWeight: "bold" }}>Gender:</span>{" "}
+                  {item.gender}
+                </p>
+                <p className="text-sm text-gray-600">
+                  <span style={{ fontWeight: "bold" }}>Age:</span> {item.age}{" "}
+                  months old
+                </p>
+                <p className="text-sm text-gray-600">
+                  <span style={{ fontWeight: "bold" }}>Medical History:</span>{" "}
                   {item.medhistory.length > 0 ? (
                     <>
                       {item.medhistory.join(", ")}
-                      {item.others ? `, ${item.others}` : ''}
+                      {item.others ? `, ${item.others}` : ""}
                     </>
                   ) : (
                     item.others
