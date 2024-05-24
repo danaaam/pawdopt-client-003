@@ -364,7 +364,7 @@ function FriendNeedsHome() {
                     verified={verified}
                     petOwnerId={item.user_id} // Pass the pet's owner ID as a prop
                   />
-                  {userId === item.user_id && (
+                  {(userId === item.user_id || role === "admin") && (
                     <button
                       onClick={() => handleDeletePet(item._id)}
                       className="ml-4 px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 focus:outline-none focus:ring focus:ring-red-500 focus:ring-opacity-50"
