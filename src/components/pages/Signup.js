@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -7,30 +7,40 @@ import { FaPaw } from "react-icons/fa";
 const Signup = () => {
   const [firstname, setFirstname] = useState("");
   const [lastname, setLastname] = useState("");
+  const [middlename, setMiddlename] = useState("");
+  const [suffix, setSuffix] = useState("");
   const [email, setEmail] = useState("");
+  const [facebook, setFacebook] =useState("");
   const [password, setPassword] = useState("");
-  const [contactInfo, setContactInfo] = useState("");
-  const [address, setAddress] = useState("");
-
-
-
+  const [contactInfo, setContactInfo] = useState("+63 ");
+  const [currentAddress, setCurrentAddress] = useState("");
+  const [permanentAddress, setPermanentAddress] = useState("");
   const [isPasswordFocused, setIsPasswordFocused] = useState(false);
-
+  const [validDocs, setValidDocs] = useState(null); // Renamed state variable
+  const fileInputRef = useRef(null); // Ref for file input element
 
   const navigate = useNavigate();
 
   const handleSubmit = async () => {
     try {
+      const formData = new FormData();
+      formData.append("file", validDocs); // Append validDocs to FormData
+
       const response = await axios.post("http://localhost:8000/api/register", {
         firstname,
         lastname,
+        middlename,
+        suffix,
         email,
         password,
         contactInfo,
-        address
+        currentAddress,
+        permanentAddress,
+        formData,
+        facebook
       });
+
       if (response.status === 200) {
-        console.log(handleSubmit);
         navigate("/signin");
         toast.success("Account successfully created");
       } else {
@@ -41,6 +51,24 @@ const Signup = () => {
     }
   };
 
+  const handleContactInfoChange = (e) => {
+    let value = e.target.value;
+    if (!value.startsWith("+63")) {
+      value = "+63" + value.replace(/^\+/, "");
+    }
+    setContactInfo(value);
+  };
+
+  const handleFileUpload = (e) => {
+    const file = e.target.files[0];
+    if (file && (file.type === "image/jpeg" || file.type === "image/png")) {
+      setValidDocs(file);
+    } else {
+      setValidDocs(null);
+      toast.error("Please upload a valid JPEG or PNG file.");
+    }
+  };
+  
 
   const validatePassword = () => {
     const hasSpecialChar = /[$&+,:;=?@#|'<>.^*()%!-]/.test(password);
@@ -48,7 +76,6 @@ const Signup = () => {
     const hasLowercase = /[a-z]/.test(password);
     const hasUppercase = /[A-Z]/.test(password);
     const hasLength = password.length >= 8;
-
     return {
       hasSpecialChar,
       hasNumber,
@@ -65,7 +92,6 @@ const Signup = () => {
       <span className="text-red-500">&#10060;</span>
     );
   };
-  
 
   return (
     <div>
@@ -76,7 +102,7 @@ const Signup = () => {
         >
           <div className="md:flex w-full">
             <div className="hidden md:block w-1/2 bg-[#6dbb48] py-10 px-10">
-            <FaPaw className="w-full h-full text-white"/>
+              <FaPaw className="w-full h-full text-white" />
             </div>
             <div className="w-full md:w-1/2 py-10 px-5 md:px-10">
               <div className="text-center mb-10">
@@ -87,8 +113,8 @@ const Signup = () => {
                 <div className="flex -mx-3">
                   {/* First Name */}
                   <div className="w-1/2 px-3 mb-5">
-                    <label htmlFor className="text-xs font-semibold px-1">
-                      First name
+                    <label htmlFor="firstname" className="text-xs font-semibold px-1">
+                      First name<span className="text-red-400 font-extrabold">*</span>
                     </label>
                     <div className="flex">
                       <div className="w-10 z-10 pl-1 text-center pointer-events-none flex items-center justify-center">
@@ -96,8 +122,8 @@ const Signup = () => {
                       </div>
                       <input
                         type="text"
-                        placeholder="First Name"
-                        name="fistname"
+                        placeholder="Juan"
+                        name="firstname"
                         onChange={(e) => setFirstname(e.target.value)}
                         value={firstname}
                         required
@@ -107,8 +133,8 @@ const Signup = () => {
                   </div>
                   {/* Last Name */}
                   <div className="w-1/2 px-3 mb-5">
-                    <label htmlFor className="text-xs font-semibold px-1">
-                      Last name
+                    <label htmlFor="lastname" className="text-xs font-semibold px-1">
+                      Last name<span className="text-red-400 font-extrabold">*</span>
                     </label>
                     <div className="flex">
                       <div className="w-10 z-10 pl-1 text-center pointer-events-none flex items-center justify-center">
@@ -116,7 +142,7 @@ const Signup = () => {
                       </div>
                       <input
                         type="text"
-                        placeholder="Last Name"
+                        placeholder="dela Cruz"
                         name="lastname"
                         onChange={(e) => setLastname(e.target.value)}
                         value={lastname}
@@ -126,11 +152,64 @@ const Signup = () => {
                     </div>
                   </div>
                 </div>
+                <div className="flex -mx-3">
+                  {/* Middle name */}
+                  <div className="w-1/2 px-3 mb-5">
+                    <label htmlFor="middlename" className="text-xs font-semibold px-1">
+                      Middle name
+                    </label>
+                    <div className="flex">
+                      <div className="w-10 z-10 pl-1 text-center pointer-events-none flex items-center justify-center">
+                        <i className="mdi mdi-account-outline text-gray-400 text-lg" />
+                      </div>
+                      <input
+                        type="text"
+                        placeholder="Optional"
+                        name="middlename"
+                        onChange={(e) => setMiddlename(e.target.value)}
+                        value={middlename}
+                        required
+                        className="w-full -ml-10 pl-10 pr-3 py-2 rounded-lg border-2 border-gray-200 outline-none focus:border-[#6dbb48]"
+                      />
+                    </div>
+                  </div>
+                  {/* Suffix */}
+                <div className=" px-3 mb-5">
+                  <label htmlFor="suffix" className="text-xs font-semibold px-1">
+                    Suffix
+                  </label>
+                  <div className="flex">
+                    <div className="w-10 z-10 pl-1 text-center pointer-events-none flex items-center justify-center">
+                      <i className="mdi mdi-account-outline text-gray-400 text-lg" />
+                    </div>
+                    {/* Dropdown selection */}
+                    <select
+                      id="suffix"
+                      name="suffix"
+                      onChange={(e) => setSuffix(e.target.value)}
+                      value={suffix}
+                      required
+                      className="w-full -ml-10 pl-10 pr-3 py-2 rounded-lg border-2 border-gray-200 outline-none focus:border-[#6dbb48]"
+                    >
+                      {/* Placeholder option */}
+                      <option value="">Select</option>
+                      {/* Options for suffixes */}
+                      <option value="Jr.">Jr.</option>
+                      <option value="Sr.">Sr.</option>
+                      <option value="II">II</option>
+                      <option value="III">III</option>
+                      <option value="IV">IV</option>
+                      {/* Add more options as needed */}
+                    </select>
+                  </div>
+                </div>
+
+                </div>
                 {/* Email */}
                 <div className="flex -mx-3">
                   <div className="w-full px-3 mb-5">
-                    <label htmlFor className="text-xs font-semibold px-1">
-                      Email
+                    <label htmlFor="email" className="text-xs font-semibold px-1">
+                      Email<span className="text-red-400 font-extrabold">*</span>
                     </label>
                     <div className="flex">
                       <div className="w-10 z-10 pl-1 text-center pointer-events-none flex items-center justify-center">
@@ -138,7 +217,7 @@ const Signup = () => {
                       </div>
                       <input
                         type="text"
-                        placeholder="Email Address"
+                        placeholder="juandelacruz@gmail.com"
                         name="email"
                         onChange={(e) => setEmail(e.target.value)}
                         value={email}
@@ -151,18 +230,18 @@ const Signup = () => {
                 {/* Contact Info */}
                 <div className="flex -mx-3">
                   <div className="w-full px-3 mb-5">
-                    <label htmlFor className="text-xs font-semibold px-1">
-                      Contact Number
+                    <label htmlFor="contactInfo" className="text-xs font-semibold px-1">
+                      Contact Number<span className="text-red-400 font-extrabold">*</span>
                     </label>
                     <div className="flex">
                       <div className="w-10 z-10 pl-1 text-center pointer-events-none flex items-center justify-center">
-                        <i className="mdi mdi-email-outline text-gray-400 text-lg" />
+                        <i className="mdi mdi-phone-outline text-gray-400 text-lg" />
                       </div>
                       <input
                         type="text"
-                        placeholder="Contact Number"
+                        placeholder="9000000000"
                         name="contactInfo"
-                        onChange={(e) => setContactInfo(e.target.value)}
+                        onChange={handleContactInfoChange}
                         value={contactInfo}
                         required
                         className="w-full -ml-10 pl-10 pr-3 py-2 rounded-lg border-2 border-gray-200 outline-none focus:border-[#6dbb48]"
@@ -170,11 +249,11 @@ const Signup = () => {
                     </div>
                   </div>
                 </div>
-                {/* Address */}
+                {/* Facebook */}
                 <div className="flex -mx-3">
                   <div className="w-full px-3 mb-5">
-                    <label htmlFor className="text-xs font-semibold px-1">
-                      Address
+                    <label htmlFor="facebook" className="text-xs font-semibold px-1">
+                      Facebook Link<span className="text-red-400 font-extrabold">*</span>
                     </label>
                     <div className="flex">
                       <div className="w-10 z-10 pl-1 text-center pointer-events-none flex items-center justify-center">
@@ -182,21 +261,69 @@ const Signup = () => {
                       </div>
                       <input
                         type="text"
-                        placeholder="Address"
-                        name="address"
-                        onChange={(e) => setAddress(e.target.value)}
-                        value={address}
+                        placeholder="www.facebook.com/username"
+                        name="facebook"
+                        onChange={(e) => setFacebook(e.target.value)}
+                        value={facebook}
                         required
                         className="w-full -ml-10 pl-10 pr-3 py-2 rounded-lg border-2 border-gray-200 outline-none focus:border-[#6dbb48]"
                       />
                     </div>
                   </div>
                 </div>
+                {/* Permanent Address */}
+                <div className="flex -mx-3">
+                  <div className="w-full px-3 mb-5">
+                    <label htmlFor="address" className="text-xs font-semibold px-1">
+                      Permanent Address<span className="text-red-400 font-extrabold">*</span>
+                    </label>
+                    <div className="flex">
+                      <div className="w-10 z-10 pl-1 text-center pointer-events-none flex items-center justify-center">
+                        <i className="mdi mdi-home-outline text-gray-400 text-lg" />
+                      </div>
+                      <input
+                        type="text"
+                        placeholder="House #/Street, Barangay, Town/City, Province"
+                        name="address"
+                        onChange={(e) => setPermanentAddress(e.target.value)}
+                        value={permanentAddress}
+                        required
+                        className="w-full -ml-10 pl-10 pr-3 py-2 rounded-lg border-2 border-gray-200 outline-none focus:border-[#6dbb48]"
+                      />
+                    </div>
+                    {/* Hint text */}
+                    <p className="text-sm text-slate-400"><i>*House #/Street, Barangay, Town/City, Province</i></p>
+                  </div>
+                </div>
+                {/* Permanent Address */}
+                <div className="flex -mx-3">
+                  <div className="w-full px-3 mb-5">
+                    <label htmlFor="address" className="text-xs font-semibold px-1">
+                      Current Address<span className="text-red-400 font-extrabold">*</span>
+                    </label>
+                    <div className="flex">
+                      <div className="w-10 z-10 pl-1 text-center pointer-events-none flex items-center justify-center">
+                        <i className="mdi mdi-home-outline text-gray-400 text-lg" />
+                      </div>
+                      <input
+                        type="text"
+                        placeholder="House #/Street, Barangay, Town/City, Province"
+                        name="address"
+                        onChange={(e) => setCurrentAddress(e.target.value)}
+                        value={currentAddress}
+                        required
+                        className="w-full -ml-10 pl-10 pr-3 py-2 rounded-lg border-2 border-gray-200 outline-none focus:border-[#6dbb48]"
+                      />
+                    </div>
+                    {/* Hint text */}
+                    <p className="text-sm text-slate-400"><i>*House #/Street, Barangay, Town/City, Province</i></p>
+                  </div>
+                </div>
                 {/* Password */}
-                <div className="flex -mx-3 relative mb-12">
+                <div className="flex -mx-3 relative mb-5">
                   <div className="w-full px-3">
-                    <label htmlFor className="text-xs font-semibold px-1">
-                      Password
+                    <label htmlFor="password" className="text-xs font-semibold px-1">
+                      Password<span className="text-red-400 font-extrabold">*</span>
                     </label>
                     <div className="flex relative">
                       <div className="w-10 z-10 pl-1 text-center pointer-events-none flex items-center justify-center">
@@ -213,8 +340,8 @@ const Signup = () => {
                         onBlur={() => setIsPasswordFocused(false)}
                         className="w-full -ml-10 pl-10 pr-3 py-2 rounded-lg border-2 border-gray-200 outline-none focus:border-[#6dbb48]"
                       />
-                      <div className="absolute top-0 right-0 mt-1 mr-3 cursor-pointer">  
-                      <i id="showPasswordIcon" class="mdi mdi-eye-outline text-gray-400 text-lg"></i>
+                      <div className="absolute top-0 right-0 mt-1 mr-3 cursor-pointer">
+                        <i id="showPasswordIcon" className="mdi mdi-eye-outline text-gray-400 text-lg"></i>
                       </div>
                       {isPasswordFocused && (
                         <div className="absolute top-full left-0 mt-1 p-1.5 bg-white border border-gray-300 rounded shadow-md z-10">
@@ -223,21 +350,43 @@ const Signup = () => {
                             validatePassword().hasSpecialChar
                           )}{" "}
                           Special Character <br />
-                          {getPasswordValidationIcon(validatePassword().hasNumber)} At
-                  least 1 Number<br />
-                  {getPasswordValidationIcon(
-                    validatePassword().hasLowercase
-                  )}{" "}
-                  Small Caps<br />
-                  {getPasswordValidationIcon(
-                    validatePassword().hasUppercase
-                  )}{" "}
-                  Big Caps<br />
-                  {getPasswordValidationIcon(validatePassword().hasLength)} At
-                  least 8 Characters                          
+                          {getPasswordValidationIcon(validatePassword().hasNumber)} At least 1 Number<br />
+                          {getPasswordValidationIcon(
+                            validatePassword().hasLowercase
+                          )}{" "}
+                          Small Caps<br />
+                          {getPasswordValidationIcon(
+                            validatePassword().hasUppercase
+                          )}{" "}
+                          Big Caps<br />
+                          {getPasswordValidationIcon(validatePassword().hasLength)} At least 8 Characters
                         </div>
                       )}
                     </div>
+                    <p className="text-sm text-slate-400"><i>*8 characters long and must contain at least 1 special character, number, lowercase, and uppercase letter.</i></p>
+                  </div>
+                </div>
+                {/* File Upload */}
+                <div className="flex -mx-3 mb-12">
+                  <div className="w-full px-3 mb-5">
+                    <label htmlFor="validDocs" className="text-xs font-semibold px-1">
+                      Upload Valid Document<span className="text-red-400 font-extrabold">*</span>
+                    </label>
+                    <div className="flex">
+                      <div className="w-10 z-10 pl-1 text-center pointer-events-none flex items-center justify-center">
+                        <i className="mdi mdi-file-upload-outline text-gray-400 text-lg" />
+                      </div>
+                      <input
+                        type="file"
+                        id="validDocs"
+                        ref={fileInputRef}
+                        accept="image/jpeg,image/png"
+                        onChange={handleFileUpload}
+                        required
+                        className="w-full -ml-10 pl-10 pr-3 py-2 rounded-lg border-2 border-gray-200 outline-none focus:border-[#6dbb48]"
+                      />
+                    </div>
+                    <p className="text-sm text-slate-400"><i>*JPEG and PNG files only.</i></p>
                   </div>
                 </div>
                 <div className="flex -mx-3">

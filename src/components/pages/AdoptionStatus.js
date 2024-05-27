@@ -73,7 +73,7 @@ function AdoptionStatus() {
 
     return (
         <center>
-            <div className="max-w-4xl w-full bg-white rounded-lg shadow-lg p-6">
+            <div className="h-screen max-w-4xl w-full bg-white rounded-lg shadow-lg p-6 overflow-x-auto">
                 <h1 className="text-center text-lg text-gray-700 mb-4 font-bold">Adoption Requests</h1>
                 {loading ? (
                     <p className="text-center text-sm text-gray-700 mb-4 font-bold">Loading...</p>

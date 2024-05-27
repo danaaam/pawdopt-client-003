@@ -89,7 +89,7 @@ function AdoptionProcess() {
   };
 
   return (
-    <div className="overflow-x-auto">
+    <div className="h-screen overflow-x-auto">
       {isLoading ? (
         <p>Loading adoption requests...</p>
       ) : adoptionrequests.length === 0 ? (
