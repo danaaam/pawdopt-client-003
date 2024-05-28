@@ -3,6 +3,8 @@ import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { FaPaw } from "react-icons/fa";
+import { mdiEyeOutline, mdiEyeOffOutline } from "@mdi/js";
+import Icon from "@mdi/react";
 
 const Signup = () => {
   const [firstname, setFirstname] = useState("");
@@ -11,13 +13,15 @@ const Signup = () => {
   const [suffix, setSuffix] = useState("");
   const [email, setEmail] = useState("");
   const [facebook, setFacebook] =useState("");
-  const [password, setPassword] = useState("");
   const [contactInfo, setContactInfo] = useState("+63 ");
   const [currentAddress, setCurrentAddress] = useState("");
   const [permanentAddress, setPermanentAddress] = useState("");
+  const [password, setPassword] = useState("");
   const [isPasswordFocused, setIsPasswordFocused] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [validDocs, setValidDocs] = useState(null); // Renamed state variable
   const fileInputRef = useRef(null); // Ref for file input element
+  const [isAgreed, setIsAgreed] = useState(false);
 
   const navigate = useNavigate();
 
@@ -330,7 +334,7 @@ const Signup = () => {
                         <i className="mdi mdi-lock-outline text-gray-400 text-lg" />
                       </div>
                       <input
-                        type="password"
+                        type={showPassword ? "text" : "password"} // Conditional type based on showPassword state
                         placeholder="***********"
                         name="password"
                         onChange={(e) => setPassword(e.target.value)}
@@ -340,25 +344,19 @@ const Signup = () => {
                         onBlur={() => setIsPasswordFocused(false)}
                         className="w-full -ml-10 pl-10 pr-3 py-2 rounded-lg border-2 border-gray-200 outline-none focus:border-[#6dbb48]"
                       />
-                      <div className="absolute top-0 right-0 mt-1 mr-3 cursor-pointer">
-                        <i id="showPasswordIcon" className="mdi mdi-eye-outline text-gray-400 text-lg"></i>
+                      <div
+                        className="absolute top-0 right-0 mt-1 mr-3 cursor-pointer"
+                        onClick={() => setShowPassword(!showPassword)} // Toggle showPassword state
+                      >
+                        <Icon path={showPassword ? mdiEyeOffOutline : mdiEyeOutline} size={1} color="gray" />
                       </div>
                       {isPasswordFocused && (
                         <div className="absolute top-full left-0 mt-1 p-1.5 bg-white border border-gray-300 rounded shadow-md z-10">
                           {/* Password Validation Icons */}
-                          {getPasswordValidationIcon(
-                            validatePassword().hasSpecialChar
-                          )}{" "}
-                          Special Character <br />
+                          {getPasswordValidationIcon(validatePassword().hasSpecialChar)} Special Character <br />
                           {getPasswordValidationIcon(validatePassword().hasNumber)} At least 1 Number<br />
-                          {getPasswordValidationIcon(
-                            validatePassword().hasLowercase
-                          )}{" "}
-                          Small Caps<br />
-                          {getPasswordValidationIcon(
-                            validatePassword().hasUppercase
-                          )}{" "}
-                          Big Caps<br />
+                          {getPasswordValidationIcon(validatePassword().hasLowercase)} Small Caps<br />
+                          {getPasswordValidationIcon(validatePassword().hasUppercase)} Big Caps<br />
                           {getPasswordValidationIcon(validatePassword().hasLength)} At least 8 Characters
                         </div>
                       )}
@@ -367,7 +365,7 @@ const Signup = () => {
                   </div>
                 </div>
                 {/* File Upload */}
-                <div className="flex -mx-3 mb-12">
+                <div className="flex -mx-3 mb-1">
                   <div className="w-full px-3 mb-5">
                     <label htmlFor="validDocs" className="text-xs font-semibold px-1">
                       Upload Valid Document<span className="text-red-400 font-extrabold">*</span>
@@ -389,25 +387,44 @@ const Signup = () => {
                     <p className="text-sm text-slate-400"><i>*JPEG and PNG files only.</i></p>
                   </div>
                 </div>
-                <div className="flex -mx-3">
-                  <div className="w-full px-3 mb-5">
-                    <button
-                      onClick={handleSubmit}
-                      className="block w-full max-w-xs mx-auto bg-[#6dbb48] hover:bg-[#84dd5a] focus:bg-[#6dbb48] text-white rounded-lg px-3 py-3 font-semibold"
-                    >
-                      Register
-                    </button>
+                {/* Terms & Conditions Checkbox */}
+                <div className="flex -mx-3 mb-5">
+                  <div className="w-full px-3">
+                    <label className="flex items-center text-xs font-semibold px-1">
+                      <input
+                        type="checkbox"
+                        className="form-checkbox cursor-pointer"
+                        checked={isAgreed}
+                        onChange={() => setIsAgreed(!isAgreed)}
+                      />
+                      <span className="ml-2">
+                        I agree to the{" "}
+                        <a href="/terms" target="_blank" className="text-[#6dbb48] underline text-sm">
+                          terms & conditions
+                        </a>
+                      </span>
+                    </label>
                   </div>
                 </div>
-                <p className="mt-10 text-center text-sm text-gray-500">
-                  Already a member?{" "}
-                  <Link
-                    to="/signin"
-                    className="font-semibold leading-6 text-[#6dbb48] hover:text-[#77df47]"
+                <div className="flex -mx-3">
+                  <div className="w-full px-3 mb-5">
+                  <button
+                    className={`block w-full max-w-xs mx-auto bg-[#6dbb48] hover:bg-green-700 focus:bg-green-700 text-white rounded-lg px-3 py-3 font-semibold ${
+                      !isAgreed ? 'cursor-not-allowed' : ''
+                    }`}
+                    onClick={handleSubmit}
+                    disabled={!isAgreed}
                   >
-                    Login
-                  </Link>
-                </p>
+                    Register
+                  </button>
+                    <p className="text-center mt-4">
+                      Already have an account?{" "}
+                      <Link to="/signin" className="text-[#6dbb48] hover:underline">
+                        Sign In
+                      </Link>
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

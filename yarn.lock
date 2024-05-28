@@ -1776,6 +1776,18 @@
   "resolved" "https://registry.npmjs.org/@leichtgewicht/ip-codec/-/ip-codec-2.0.5.tgz"
   "version" "2.0.5"
 
+"@mdi/js@^7.4.47":
+  "integrity" "sha512-KPnNOtm5i2pMabqZxpUz7iQf+mfrYZyKCZ8QNz85czgEt7cuHcGorWfdzUMWYA0SD+a6Hn4FmJ+YhzzzjkTZrQ=="
+  "resolved" "https://registry.npmjs.org/@mdi/js/-/js-7.4.47.tgz"
+  "version" "7.4.47"
+
+"@mdi/react@^1.6.1":
+  "integrity" "sha512-4qZeDcluDFGFTWkHs86VOlHkm6gnKaMql13/gpIcUQ8kzxHgpj31NuCkD8abECVfbULJ3shc7Yt4HJ6Wu6SN4w=="
+  "resolved" "https://registry.npmjs.org/@mdi/react/-/react-1.6.1.tgz"
+  "version" "1.6.1"
+  dependencies:
+    "prop-types" "^15.7.2"
+
 "@mui/base@5.0.0-beta.40":
   "integrity" "sha512-I/lGHztkCzvwlXpjD2+SNmvNQvB4227xBXhISPjEaJUXGImOQ9f3D2Yj/T3KasSI/h0MLWy74X0J6clhPmsRbQ=="
   "resolved" "https://registry.npmjs.org/@mui/base/-/base-5.0.0-beta.40.tgz"
@@ -9977,9 +9989,9 @@
     "is-typedarray" "^1.0.0"
 
 "typescript@^3.2.1 || ^4", "typescript@>= 2.7", "typescript@>=2.8.0 || >= 3.2.0-dev || >= 3.3.0-dev || >= 3.4.0-dev || >= 3.5.0-dev || >= 3.6.0-dev || >= 3.6.0-beta || >= 3.7.0-dev || >= 3.7.0-beta":
-  "integrity" "sha512-vcI4UpRgg81oIRUFwR0WSIHKt11nJ7SAVlYNIu+QpqeyXP+gpQJy/Z4+F0aGxSE4MqwjyXvW/TzgkLAx2AGHwQ=="
-  "resolved" "https://registry.npmjs.org/typescript/-/typescript-5.4.5.tgz"
-  "version" "5.4.5"
+  "integrity" "sha512-1FXk9E2Hm+QzZQ7z+McJiHL4NW1F2EzMu9Nq9i3zAaGqibafqYwCVU6WyWAuyQRRzOlxou8xZSyXLEN8oKj24g=="
+  "resolved" "https://registry.npmjs.org/typescript/-/typescript-4.9.5.tgz"
+  "version" "4.9.5"
 
 "unbox-primitive@^1.0.2":
   "integrity" "sha512-61pPlCD9h51VoreyJ0BReideM3MDKMKnh6+V9L08331ipq6Q8OFXZYiqP6n/tbHx4s5I9uRhcye6BrbkizkBDw=="
