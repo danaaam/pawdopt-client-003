@@ -13,7 +13,7 @@ const Signup = () => {
   const [suffix, setSuffix] = useState("");
   const [email, setEmail] = useState("");
   const [facebook, setFacebook] =useState("");
-  const [contactInfo, setContactInfo] = useState("+63 ");
+  const [contactinfo, setContactinfo] = useState("+63 ");
   const [currentAddress, setCurrentAddress] = useState("");
   const [permanentAddress, setPermanentAddress] = useState("");
   const [password, setPassword] = useState("");
@@ -28,22 +28,23 @@ const Signup = () => {
   const handleSubmit = async () => {
     try {
       const formData = new FormData();
-      formData.append("file", validDocs); // Append validDocs to FormData
-
-      const response = await axios.post("http://localhost:8000/api/register", {
-        firstname,
-        lastname,
-        middlename,
-        suffix,
-        email,
-        password,
-        contactInfo,
-        currentAddress,
-        permanentAddress,
-        formData,
-        facebook
-      });
-
+      formData.append("validDocs", validDocs); // Append validDocs to FormData
+  
+      formData.append("firstname", firstname);
+      formData.append("lastname", lastname);
+      formData.append("middlename", middlename);
+      formData.append("suffix", suffix);
+      formData.append("email", email);
+      formData.append("password", password);
+      formData.append("contactinfo", contactinfo);
+      formData.append("currentAddress", currentAddress);
+      formData.append("permanentAddress", permanentAddress);
+      formData.append("facebook", facebook);
+  
+      const response = await axios.post("http://localhost:8000/api/register", formData);
+  
+      console.log("response: ",response)
+  
       if (response.status === 200) {
         navigate("/signin");
         toast.success("Account successfully created");
@@ -54,13 +55,14 @@ const Signup = () => {
       console.error(error);
     }
   };
+  
 
   const handleContactInfoChange = (e) => {
     let value = e.target.value;
     if (!value.startsWith("+63")) {
       value = "+63" + value.replace(/^\+/, "");
     }
-    setContactInfo(value);
+    setContactinfo(value);
   };
 
   const handleFileUpload = (e) => {
@@ -246,7 +248,7 @@ const Signup = () => {
                         placeholder="9000000000"
                         name="contactInfo"
                         onChange={handleContactInfoChange}
-                        value={contactInfo}
+                        value={contactinfo}
                         required
                         className="w-full -ml-10 pl-10 pr-3 py-2 rounded-lg border-2 border-gray-200 outline-none focus:border-[#6dbb48]"
                       />
@@ -384,7 +386,7 @@ const Signup = () => {
                         className="w-full -ml-10 pl-10 pr-3 py-2 rounded-lg border-2 border-gray-200 outline-none focus:border-[#6dbb48]"
                       />
                     </div>
-                    <p className="text-sm text-slate-400"><i>*JPEG and PNG files only.</i></p>
+                    <p className="text-sm text-slate-400"><i>*Birth certificate, Student ID, National ID, Postal ID, etc.</i></p>
                   </div>
                 </div>
                 {/* Terms & Conditions Checkbox */}

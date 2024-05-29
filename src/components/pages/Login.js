@@ -3,11 +3,14 @@ import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { FaPaw } from "react-icons/fa";
+import Icon from "@mdi/react";
+import { mdiEyeOutline, mdiEyeOffOutline } from "@mdi/js";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -94,29 +97,35 @@ const Login = () => {
                   </div>
                 </div>
                 {/* Password */}
-                <div className="flex -mx-3">
-                  <div className="w-full px-3 mb-12">
-                    <label htmlFor className="text-xs font-semibold px-1">
-                      Password
-                    </label>
-                    
-                    <div className="flex">
-                      
-                      <div className="w-10 z-10 pl-1 text-center pointer-events-none flex items-center justify-center">
-                        <i className="mdi mdi-lock-outline text-gray-400 text-lg" />
-                      </div>
-                      <input
-                        id="password"
-                        name="password"
-                        type="password"
-                        autoComplete="current-password"
-                        placeholder="************"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
-                        className="w-full -ml-10 pl-10 pr-3 py-2 rounded-lg border-2 border-gray-200 outline-none focus:border-[#6dbb48]"
-                      />
-                    </div>
+<div className="flex -mx-3 relative mb-5">
+  <div className="w-full px-3">
+    <label htmlFor="password" className="text-xs font-semibold px-1">
+      Password
+    </label>
+    <div className="flex relative">
+      <div className="w-10 z-10 pl-1 text-center pointer-events-none flex items-center justify-center">
+        <i className="mdi mdi-lock-outline text-gray-400 text-lg" />
+      </div>
+      <input
+        id="password"
+        name="password"
+        type={showPassword ? "text" : "password"} // Conditional type based on showPassword state
+        autoComplete="current-password"
+        placeholder="************"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        required
+        className="w-full -ml-10 pl-10 pr-3 py-2 rounded-lg border-2 border-gray-200 outline-none focus:border-[#6dbb48]"
+      />
+      <div
+        className="absolute top-0 right-0 mt-1 mr-3 cursor-pointer"
+        onClick={() => setShowPassword(!showPassword)} // Toggle showPassword state
+      >
+        <Icon path={showPassword ? mdiEyeOffOutline : mdiEyeOutline} size={1} color="gray" />
+      </div>
+    </div>
+
+
                     <div className="text-sm py-2 px-1">
                 <Link
                   to="/send-otp"
