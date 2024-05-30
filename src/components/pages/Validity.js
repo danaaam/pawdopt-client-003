@@ -218,16 +218,16 @@ function Validity() {
               <div className="w-2/4">
                 {editField === 'email'? (
                   <input
-                    type="email"
+                    type="text"
                     value={editValue}
                     onChange={(e) => setEditValue(e.target.value)}
-                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                    className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline`}
                   />
                 ) : (
                   <span>{user.email}</span>
                 )}
               </div>
-              <div className="w-1/4text-right">
+              <div className="w-1/4 text-right">
                 {editField === 'email'? (
                   <button
                     onClick={() => handleSave('email')}
@@ -239,7 +239,7 @@ function Validity() {
                   <button
                     disabled
                     onClick={() => handleEdit('email')}
-                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded cursor-not-allowed"
+                    className={`bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded ${verified !== null? 'cursor-not-allowed' : ''}`}
                   >
                     Edit
                   </button>
@@ -284,17 +284,17 @@ function Validity() {
               <span className="w-1/4">Permanent Address: </span>
               <div className="w-2/4">
                 {editField === 'permanentAddress'? (
-                  <input
-                    type="text"
+                  <textarea
                     value={editValue}
                     onChange={(e) => setEditValue(e.target.value)}
                     className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                    rows={editValue.split('\n').length}
                   />
                 ) : (
                   <span>{user.permanentAddress}</span>
                 )}
               </div>
-              <div className="w-1/4 text-right">
+              <div className="w-1/6 text-right">
                 {editField === 'permanentAddress'? (
                   <button
                     onClick={() => handleSave('permanentAddress')}
@@ -304,9 +304,9 @@ function Validity() {
                   </button>
                 ) : (
                   <button
-                    disabled
+                    disabled = {verified !== null}
                     onClick={() => handleEdit('permanentAddress')}
-                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded cursor-not-allowed"
+                    className={`bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded ${verified !== null? 'cursor-not-allowed' : '' }`}
                   >
                     Edit
                   </button>
@@ -317,18 +317,18 @@ function Validity() {
             <div className="mb-2 flex items-center justify-between">
               <span className="w-1/4">Current Address: </span>
               <div className="w-2/4">
-                {editField === 'currentAddress'? (
-                  <input
-                    type="text"
-                    value={editValue}
-                    onChange={(e) => setEditValue(e.target.value)}
-                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              {editField === 'currentAddress'? (
+                  <textarea
+                  value={editValue}
+                  onChange={(e) => setEditValue(e.target.value)}
+                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                  rows={editValue.split('\n').length > 3 ? editValue.split('\n').length : 3}
                   />
                 ) : (
                   <span>{user.currentAddress}</span>
                 )}
               </div>
-              <div className="w-1/4 text-right">
+              <div className="w-1/6 text-right">
                 {editField === 'currentAddress'? (
                   <button
                     onClick={() => handleSave('currentAddress')}
