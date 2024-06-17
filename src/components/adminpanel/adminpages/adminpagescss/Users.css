@@ -36,3 +36,13 @@ table {
     background-color: #444;
   }
   
+  .email-icon {
+    font-size: 36px; /* Adjust size as needed */
+    color: #3B82F6; /* Example color */
+    cursor: pointer;
+  }
+  
+  .email-icon:hover {
+    color: #2563EB; /* Example hover color */
+  }
+  

@@ -19,6 +19,7 @@ const Modal = ({ show, onClose, user, fetchUsers }) => {
     }));
   };
 
+
   const handleSaveEdit = async (field) => {
     try {
       await axios.patch(`http://localhost:8000/api/edit/users/${user._id}`, { [field]: editedUser[field] });
@@ -93,7 +94,7 @@ const Modal = ({ show, onClose, user, fetchUsers }) => {
                 ) : (
                   <>
                     {key === 'facebook' ? (
-                      <a href={user[key]} target="_blank" rel="noopener noreferrer">{user[key]}</a>
+                      <a href={user[key]} target="_blank" rel="noopener noreferrer" className="text-left text-blue-500 text-decoration-line: underline;">{user[key]}</a>
                     ) : (
                       <span>{user[key]}</span>
                     )}

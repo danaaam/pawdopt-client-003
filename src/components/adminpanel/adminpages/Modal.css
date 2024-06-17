@@ -104,4 +104,9 @@
   .valid-id.zoomed {
     transform: scale(2);
   }
+
+  .facebookLink {
+    color: blue;
+    text-decoration: underline;
+  }
   

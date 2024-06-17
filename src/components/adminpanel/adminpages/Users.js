@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import "./adminpagescss/Users.css";
 import { toast } from "react-toastify";
+import { FaEnvelope } from "react-icons/fa"; // Import email icon
 import Modal from "./Modal"; // Ensure you have the Modal component
+import "./adminpagescss/Users.css";
 
 function Users() {
   const [users, setUsers] = useState([]);
   const [viewingUser, setViewingUser] = useState(null);
+  const [adminMessage, setAdminMessage] = useState(""); // Add this state if needed
   const roles = ["Admin", "User", "Manager"]; // Example roles
 
   useEffect(() => {
@@ -31,12 +33,15 @@ function Users() {
     setViewingUser(null);
   };
 
-  const handleVerifiedChange = async (userId, isVerified) => {
+  const handleToggleVerification = async (user, value) => {
+    const updatedUser = { ...user, verified: value, adminMessage: adminMessage };
     try {
-      console.log(`Updating user ${userId} verified status to ${isVerified}`);
-      const response = await axios.patch(`http://localhost:8000/api/edit/users/${userId}`, { verified: isVerified });
+      console.log(`Toggling verification for user ${user._id} to ${value}`);
+      const response = await axios.put(
+        `http://localhost:8000/api/toggle-verification/${user._id}`,
+        updatedUser
+      );
       console.log("Server response:", response.data);
-
       if (response.status === 200) {
         fetchUsers();
         toast.success("User verification status updated successfully!");
@@ -44,7 +49,7 @@ function Users() {
         toast.error("Failed to update verification status.");
       }
     } catch (error) {
-      console.error("Error updating verification status:", error);
+      console.error("Error toggling user verification:", error);
       toast.error("Failed to update verification status.");
     }
   };
@@ -67,6 +72,10 @@ function Users() {
     }
   };
 
+  const handleSendEmail = (email) => {
+    window.open(`https://mail.google.com/mail/?view=cm&fs=1&tf=1&to=${email}`);
+  };
+
   return (
     <div className="h-screen overflow-x-auto">
       <table className="min-w-full divide-y divide-gray-200">
@@ -76,13 +85,7 @@ function Users() {
               Firstname
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Middlename
-            </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Lastname
-            </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Suffix
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Role
@@ -99,9 +102,7 @@ function Users() {
           {users.map((user) => (
             <tr key={user._id}>
               <td className="px-6 py-4 whitespace-nowrap">{user.firstname}</td>
-              <td className="px-6 py-4 whitespace-nowrap">{user.middlename}</td>
               <td className="px-6 py-4 whitespace-nowrap">{user.lastname}</td>
-              <td className="px-6 py-4 whitespace-nowrap">{user.suffix}</td>
               <td className="px-6 py-4 whitespace-nowrap">
                 <select
                   value={user.role}
@@ -121,7 +122,7 @@ function Users() {
                   onChange={(e) => {
                     const newVerified = e.target.value === "true";
                     console.log(`Selected value: ${e.target.value}, New verified: ${newVerified}`);
-                    handleVerifiedChange(user._id, newVerified);
+                    handleToggleVerification(user, newVerified);
                   }}
                   className="border border-gray-300 rounded-md"
                 >
@@ -129,13 +130,17 @@ function Users() {
                   <option value="false">Unverify</option>
                 </select>
               </td>
-              <td className="px-6 py-4 whitespace-nowrap">
+              <td className="px-6 py-4 whitespace-nowrap flex items-center space-x-2">
                 <button
                   onClick={() => handleViewMore(user)}
                   className="px-2 py-1 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600"
                 >
                   View More
                 </button>
+                <FaEnvelope
+                  className="email-icon"
+                  onClick={() => handleSendEmail(user.email)}
+                />
               </td>
             </tr>
           ))}
