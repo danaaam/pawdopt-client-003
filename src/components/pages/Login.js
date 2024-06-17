@@ -19,7 +19,7 @@ const Login = () => {
         email,
         password,
       });
-      const { token, role, id } = response.data;
+      const { token, role, id, firstname, middlename, lastname, suffix } = response.data;
 
       // Fetch verification status after successful login
       const verificationResponse = await axios.get(
@@ -33,6 +33,7 @@ const Login = () => {
       localStorage.setItem("email", email);
       localStorage.setItem("id", id);
       localStorage.setItem("verified", verified);
+      localStorage.setItem("firstname", firstname)
       window.localStorage.setItem("isLoggedin", true); 
       
 

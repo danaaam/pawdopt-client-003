@@ -190,6 +190,7 @@ function FriendNeedsHome() {
   // Get user ID from local storage
   const userId = localStorage.getItem("id");
   const role = localStorage.getItem("role");
+  const firstname = localStorage.getItem("firstname");
 
   return (
     <div className="bg-gray-100 min-h-screen py-8">
@@ -334,6 +335,7 @@ function FriendNeedsHome() {
                   />
                 </label>
               </div>
+
               <div className="mt-6 flex justify-end">
                 <button
                   type="submit"
@@ -367,6 +369,12 @@ function FriendNeedsHome() {
                   <strong>Pet#:</strong>{" "}
                   <span className="text-xs font-medium text-green-400">
                     {item._id}
+                  </span>
+                </p>
+                <p className="text-xs text-left">
+                  <strong>Posted by:</strong>{" "}
+                  <span className="text-xs font-medium text-green-400">
+                    {item.user_id}
                   </span>
                 </p>
                 <p className="text-sm text-gray-600 m-3">"{item.caption}"</p>

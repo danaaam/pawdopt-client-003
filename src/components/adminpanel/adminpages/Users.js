@@ -2,28 +2,14 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "./adminpagescss/Users.css";
 import { toast } from "react-toastify";
+import Modal from "./Modal"; // Ensure you have the Modal component
 
 function Users() {
-
-
-  const [adminMessage, setAdminMessage] = useState('');
-  
   const [users, setUsers] = useState([]);
-  const [editingUserId, setEditingUserId] = useState(null);
-  const [editedUser, setEditedUser] = useState({
-    _id: null,
-    firstname: "",
-    lastname: "",
-    email: "",
-    contactinfo: "",
-    address: "",
-    password: "",
-    verified: false,
-    role: "",
-  });
+  const [viewingUser, setViewingUser] = useState(null);
+  const roles = ["Admin", "User", "Manager"]; // Example roles
 
   useEffect(() => {
-    // Fetch users data when the component mounts
     fetchUsers();
   }, []);
 
@@ -33,74 +19,53 @@ function Users() {
       setUsers(response.data);
     } catch (error) {
       console.error("Error fetching users:", error);
+      toast.error("Failed to fetch users.");
     }
   };
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setEditedUser((prevState) => ({
-      ...prevState,
-      [name]: value,
-    }));
+  const handleViewMore = (user) => {
+    setViewingUser(user);
   };
 
-  const handleEditUser = (user) => {
-    setEditingUserId(user._id);
-    setEditedUser(user);
+  const closeModal = () => {
+    setViewingUser(null);
   };
 
-  const handleSaveEdit = async () => {
+  const handleVerifiedChange = async (userId, isVerified) => {
     try {
-      await axios.patch(
-        `http://localhost:8000/api/edit/users/${editedUser._id}`,
-        editedUser
-      );
-      setEditingUserId(null);
-      setEditedUser({
-        _id: null,
-        firstname: "",
-        lastname: "",
-        email: "",
-        contactinfo: "",
-        address: "",
-        password: "",
-        verified: false,
-        role: "",
-        adminMessage: ""
-      });
-      fetchUsers();
-      // Alert message when edit is successful
-      toast.success("User saved successfully!");
-    } catch (error) {
-      console.error("Error editing user:", error);
-    }
-  };
-  const handleCancelEdit = () => {
-    window.location.reload();
-  };
+      console.log(`Updating user ${userId} verified status to ${isVerified}`);
+      const response = await axios.patch(`http://localhost:8000/api/edit/users/${userId}`, { verified: isVerified });
+      console.log("Server response:", response.data);
 
-  const handleDeleteUser = async (id) => {
-    try {
-      await axios.delete(`http://localhost:8000/api/delete/users/${id}`);
-      fetchUsers(); // Refresh users data after deleting
+      if (response.status === 200) {
+        fetchUsers();
+        toast.success("User verification status updated successfully!");
+      } else {
+        toast.error("Failed to update verification status.");
+      }
     } catch (error) {
-      console.error("Error deleting user:", error);
+      console.error("Error updating verification status:", error);
+      toast.error("Failed to update verification status.");
     }
   };
 
-  const handleToggleVerification = async (user, value) => {
-    const updatedUser = { ...user, verified: value, adminMessage: adminMessage };
+  const handleRoleChange = async (userId, newRole) => {
     try {
-      await axios.put(
-        `http://localhost:8000/api/toggle-verification/${user._id}`,
-        updatedUser
-      );
-      fetchUsers();
+      console.log(`Updating user ${userId} role to ${newRole}`);
+      const response = await axios.patch(`http://localhost:8000/api/edit/users/${userId}`, { role: newRole });
+      console.log("Server response:", response.data);
+
+      if (response.status === 200) {
+        fetchUsers();
+        toast.success("User role updated successfully!");
+      } else {
+        toast.error("Failed to update user role.");
+      }
     } catch (error) {
-      console.error("Error toggling user verification:", error);
+      console.error("Error updating user role:", error);
+      toast.error("Failed to update user role.");
     }
   };
-  
 
   return (
     <div className="h-screen overflow-x-auto">
@@ -111,16 +76,13 @@ function Users() {
               Firstname
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Middlename
+            </th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Lastname
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Email
-            </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Contact number
-            </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Address
+              Suffix
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Role
@@ -136,144 +98,53 @@ function Users() {
         <tbody className="bg-white divide-y divide-gray-200">
           {users.map((user) => (
             <tr key={user._id}>
+              <td className="px-6 py-4 whitespace-nowrap">{user.firstname}</td>
+              <td className="px-6 py-4 whitespace-nowrap">{user.middlename}</td>
+              <td className="px-6 py-4 whitespace-nowrap">{user.lastname}</td>
+              <td className="px-6 py-4 whitespace-nowrap">{user.suffix}</td>
               <td className="px-6 py-4 whitespace-nowrap">
-                {editingUserId === user._id ? (
-                  <input
-                    type="text"
-                    name="firstname"
-                    value={editedUser.firstname}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-indigo-200"
-                  />
-                ) : (
-                  <span>{user.firstname}</span>
-                )}
+                <select
+                  value={user.role}
+                  onChange={(e) => handleRoleChange(user._id, e.target.value)}
+                  className="border border-gray-300 rounded-md"
+                >
+                  {roles.map((role) => (
+                    <option key={role} value={role}>
+                      {role}
+                    </option>
+                  ))}
+                </select>
               </td>
               <td className="px-6 py-4 whitespace-nowrap">
-                {editingUserId === user._id ? (
-                  <input
-                    type="text"
-                    name="lastname"
-                    value={editedUser.lastname}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-indigo-200"
-                  />
-                ) : (
-                  <span>{user.lastname}</span>
-                )}
+                <select
+                  value={user.verified.toString()}
+                  onChange={(e) => {
+                    const newVerified = e.target.value === "true";
+                    console.log(`Selected value: ${e.target.value}, New verified: ${newVerified}`);
+                    handleVerifiedChange(user._id, newVerified);
+                  }}
+                  className="border border-gray-300 rounded-md"
+                >
+                  <option value="true">Verify</option>
+                  <option value="false">Unverify</option>
+                </select>
               </td>
               <td className="px-6 py-4 whitespace-nowrap">
-                {editingUserId === user._id ? (
-                  <input
-                    type="email"
-                    name="email"
-                    value={editedUser.email}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-indigo-200"
-                  />
-                ) : (
-                  <span>{user.email}</span>
-                )}
+                <button
+                  onClick={() => handleViewMore(user)}
+                  className="px-2 py-1 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600"
+                >
+                  View More
+                </button>
               </td>
-              <td className="px-6 py-4 whitespace-nowrap">
-                {editingUserId === user._id ? (
-                  <input
-                    type="text"
-                    name="contactinfo"
-                    value={editedUser.contactinfo}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-indigo-200"
-                  />
-                ) : (
-                  <span>{user.contactinfo}</span>
-                )}
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap">
-                {editingUserId === user._id ? (
-                  <input
-                    type="text"
-                    name="address"
-                    value={editedUser.address}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-indigo-200"
-                  />
-                ) : (
-                  <span>{user.address}</span>
-                )}
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap">
-                {editingUserId === user._id ? (
-                  <select
-                    name="role"
-                    value={editedUser.role}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-indigo-200"
-                  >
-                    <option value="admin">Admin</option>
-                    <option value="user">User</option>
-                    {/* Add more options as needed */}
-                  </select>
-                ) : (
-                  <span>{user.role}</span>
-                )}
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap">
-                  {editingUserId === user._id ? (
-                    <div className="flex items-center">
-                      <select
-                      value={user.verified ? "true" : "false"}
-                      onChange={(e) =>
-                        handleToggleVerification(user, e.target.value === "true")
-                      }
-                      className="mr-2 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-indigo-200"
-                    >
-                      <option value="false">Unverify</option>
-                      <option value="true">Verify</option>
-                    </select>
-
-                    </div>
-                  ) : (
-                    <span>{user.verified ? "Verified" : "Not Verified"}</span>
-                  )}
-                </td>
-              <td className="px-6 py-4 whitespace-nowrap">
-              {editingUserId === user._id ? (
-              <div>
-              <button
-                onClick={handleSaveEdit}
-                className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600 mr-2 mb-2"
-              >
-                Save
-              </button>
-              <button
-                onClick={handleCancelEdit}
-                className="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 focus:outline-none focus:bg-gray-600 mr-2 mb-2"
-              >
-                Cancel
-              </button>
-            </div>
-             ) : (
-            <div className="flex flex-col">
-              <button
-                onClick={() => handleEditUser(user)}
-                className="px-4 py-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 focus:outline-none focus:bg-yellow-600 mr-2 mb-2"
-              >
-                Edit
-              </button>
-              <button
-                onClick={() => handleDeleteUser(user._id)}
-                className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 focus:outline-none focus:bg-red-600 mr-2 mb-2"
-              >
-                Delete
-              </button>
-            </div>
-          )}
-        </td>
-
             </tr>
           ))}
         </tbody>
       </table>
+
+      {viewingUser && (
+        <Modal show={!!viewingUser} onClose={closeModal} user={viewingUser} fetchUsers={fetchUsers} />
+      )}
     </div>
   );
 }
