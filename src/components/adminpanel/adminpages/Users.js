@@ -9,7 +9,7 @@ function Users() {
   const [users, setUsers] = useState([]);
   const [viewingUser, setViewingUser] = useState(null);
   const [adminMessage, setAdminMessage] = useState(""); // Add this state if needed
-  const roles = ["Admin", "User", "Manager"]; // Example roles
+  const roles = ["admin", "user"]; // Example roles
 
   useEffect(() => {
     fetchUsers();

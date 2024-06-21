@@ -3,7 +3,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 
 function AdoptionProcess() {
-  const [adoptionrequests, setAdoptionRequests] = useState([]);
+  const [adoptionRequests, setAdoptionRequests] = useState([]);
   const [adminMessage, setAdminMessage] = useState({});
   const [selectedRequest, setSelectedRequest] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -88,11 +88,25 @@ function AdoptionProcess() {
     }
   };
 
+  const handleSendMessage = async (id) => {
+    try {
+      await axios.put(
+        `http://localhost:8000/api/adoption/request/edit/${id}`,
+        { adminMessage: adminMessage[id] },
+        { headers: { "Content-Type": "application/json" } }
+      );
+      toast.success("Message sent");
+    } catch (error) {
+      console.error("Error sending message:", error);
+      toast.error("Failed to send message");
+    }
+  };
+
   return (
     <div className="h-screen overflow-x-auto">
       {isLoading ? (
         <p>Loading adoption requests...</p>
-      ) : adoptionrequests.length === 0 ? (
+      ) : adoptionRequests.length === 0 ? (
         <p>No pending adoption requests.</p>
       ) : (
         <table className="min-w-full divide-y divide-gray-200">
@@ -108,7 +122,7 @@ function AdoptionProcess() {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {adoptionrequests.map((item) => (
+            {adoptionRequests.map((item) => (
               <tr key={item._id}>
                 <td className="px-6 py-4 whitespace-nowrap">{item.email}</td>
                 <td className="px-6 py-4 whitespace-nowrap">{item.name}</td>
@@ -139,6 +153,12 @@ function AdoptionProcess() {
                         Decline
                       </button>
                     </div>
+                    <button
+                      onClick={() => handleSendMessage(item._id)}
+                      className="mt-2 px-4 py-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 focus:outline-none focus:bg-yellow-600"
+                    >
+                      Send
+                    </button>
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
