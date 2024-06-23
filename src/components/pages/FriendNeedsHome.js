@@ -4,18 +4,23 @@ import "./pagescss/FriendNeedsHome.css";
 import { useNavigate } from "react-router-dom";
 import AdoptButton from "./AdoptButton";
 import { toast } from "react-toastify";
+import EditPetModal from "./EditPetModal";
 
 function FriendNeedsHome() {
   const [selectedImage, setSelectedImage] = useState(null);
   const [isFormVisible, setIsFormVisible] = useState(false);
-  const [usergalleryData, setuserGalleryData] = useState([]);
+  const [userGalleryData, setUserGalleryData] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate("");
   const [formSubmitted, setFormSubmitted] = useState(false); // State to track adoption submission
   const [verified, setVerified] = useState(false);
   const [updateCount, setUpdateCount] = useState(0);
+  const [editMode, setEditMode] = useState(false);
+  const [editPetId, setEditPetId] = useState(null);
+  const [editPet, setEditPet] = useState(null); // State for the pet being edited
+  const [userInfo, setUserInfo] = useState({});
 
-  // Remaining state variables for form fields
+  // State variables for form fields
   const [caption, setCaption] = useState("");
   const [breed, setBreed] = useState("");
   const [age, setAge] = useState("");
@@ -51,10 +56,8 @@ function FriendNeedsHome() {
   const handleEditMedHistory = (event) => {
     const { value } = event.target;
     if (medhistory.includes(value)) {
-      // If already selected, remove it from the array
       setMedHistory(medhistory.filter((term) => term !== value));
     } else {
-      // If not selected, add it to the array
       setMedHistory([...medhistory, value]);
     }
   };
@@ -70,12 +73,12 @@ function FriendNeedsHome() {
   };
 
   const handleFileChange = (event) => {
-    const selectedFiles = Array.from(event.target.files); // Convert to array
+    const selectedFiles = Array.from(event.target.files);
     setSelectedImage(selectedFiles);
   };
 
   const handleAddToGallery = async (event) => {
-    event.preventDefault(); // Prevent default form submission
+    event.preventDefault();
 
     try {
       const token = localStorage.getItem("token");
@@ -108,16 +111,31 @@ function FriendNeedsHome() {
       formData.append("medhistory", medhistory.join(", "));
       formData.append("others", others);
 
-      await axios.post("http://localhost:8000/api/user/upload", formData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      if (editMode && editPetId) {
+        await axios.put(
+          `http://localhost:8000/api/user/gallery/${editPetId}`,
+          formData,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        toast.success("Pet information updated successfully");
+        setEditMode(false);
+        setEditPetId(null);
+      } else {
+        await axios.post("http://localhost:8000/api/user/upload", formData, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
-      toast.success("Image uploaded successfully and pending approval");
-      setFormSubmitted(true); // Set formSubmitted to true upon successful submission
+        toast.success("Image uploaded successfully");
+      }
+      setFormSubmitted(true);
+      setIsFormVisible(false);
 
-      // Reload the page to update the gallery (you can use state to avoid full page reload)
       window.location.reload();
     } catch (error) {
       console.error("Error uploading:", error);
@@ -142,11 +160,24 @@ function FriendNeedsHome() {
       });
 
       toast.success("Pet deleted successfully");
-      setUpdateCount(updateCount + 1); // Trigger a re-fetch of the gallery
+      setUpdateCount(updateCount + 1);
     } catch (error) {
       console.error("Error deleting pet:", error);
       toast.error("Error deleting pet");
     }
+  };
+
+  const handleEditPet = (pet) => {
+    setEditPet(pet);
+    setIsModalOpen(true);
+  };
+
+  const closeEditModal = () => {
+    setIsModalOpen(false);
+  };
+
+  const updateGallery = () => {
+    setUpdateCount(updateCount + 1);
   };
 
   useEffect(() => {
@@ -163,7 +194,7 @@ function FriendNeedsHome() {
           ...image,
           isAdoptFormVisible: false,
         }));
-        setuserGalleryData(updatedData);
+        setUserGalleryData(updatedData);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -184,13 +215,28 @@ function FriendNeedsHome() {
   };
 
   const handleAdoptionSubmitted = () => {
-    setFormSubmitted(true); // Set formSubmitted to true upon successful adoption submission
+    setFormSubmitted(true);
   };
 
-  // Get user ID from local storage
   const userId = localStorage.getItem("id");
   const role = localStorage.getItem("role");
   const firstname = localStorage.getItem("firstname");
+
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      try {
+        const response = await axios.get("http://localhost:8000/api/getallusers");
+        const userMap = response.data.reduce((map, user) => {
+          map[user._id] = user;
+          return map;
+        }, {});
+        setUserInfo(userMap);
+      } catch (error) {
+        console.error("Error fetching user info:", error);
+      }
+    };
+    fetchUserInfo();
+  }, []);
 
   return (
     <div className="bg-gray-100 min-h-screen py-8">
@@ -208,7 +254,7 @@ function FriendNeedsHome() {
             } transition duration-300`}
             disabled={!verified}
           >
-            {isFormVisible ? "Pending" : "+ Add Pets"}
+            {isFormVisible ? "Cancel" : "+ Add Pets"}
           </button>
         </div>
       </div>
@@ -220,133 +266,300 @@ function FriendNeedsHome() {
             </h3>
             <form onSubmit={handleAddToGallery}>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <label className="block">
-                  <span className="text-gray-700">Maximum of 4 images</span>
+                <div>
+                  <label className="block mb-1 font-medium text-gray-700">
+                    Image:
+                  </label>
                   <input
-                    className="mt-1 p-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50"
                     type="file"
-                    accept="image/*"
                     onChange={handleFileChange}
                     multiple
-                    required
+                    className="w-full"
                   />
-                </label>
-                <label className="block">
-                  <span className="text-gray-700">Caption:</span>
+                </div>
+                <div>
+                  <label className="block mb-1 font-medium text-gray-700">
+                    Pet's Name:
+                  </label>
                   <input
-                    className="mt-1 p-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50"
                     type="text"
-                    placeholder="Enter Caption"
                     value={caption}
                     onChange={handleEditCaption}
-                    required
+                    className="w-full border border-gray-300 p-2 rounded-md"
                   />
-                </label>
-                <label className="block">
-                  <span className="text-gray-700">Breed:</span>
+                </div>
+                <div>
+                  <label className="block mb-1 font-medium text-gray-700">
+                    Breed:
+                  </label>
                   <input
-                    className="mt-1 p-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50"
                     type="text"
-                    placeholder="Enter Breed"
                     value={breed}
                     onChange={handleEditBreed}
-                    required
+                    className="w-full border border-gray-300 p-2 rounded-md"
                   />
-                </label>
-                <label className="block">
-                  <span className="text-gray-700">Species:</span>
-                  <input
-                    className="mt-1 p-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50"
-                    type="text"
-                    placeholder="Type of animal"
-                    value={species}
-                    onChange={handleEditSpecies}
-                  />
-                </label>
-                <label className="block">
-                  <span className="text-gray-700">Select Gender:</span>
+                </div>
+                <div>
+                  <label className="block mb-1 font-medium text-gray-700">
+                    Gender:
+                  </label>
                   <select
-                    className="mt-1 p-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50"
                     value={gender}
                     onChange={handleEditGender}
-                    required
+                    className="w-full border border-gray-300 p-2 rounded-md"
                   >
-                    <option value="" disabled>
-                      Select Gender
-                    </option>
-                    <option value="male">Male</option>
-                    <option value="female">Female</option>
+                    <option value="">Select Gender</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
                   </select>
-                </label>
-                <label className="block">
-                  <span className="text-gray-700">Age:</span>
+                </div>
+                <div>
+                  <label className="block mb-1 font-medium text-gray-700">
+                    Age:
+                  </label>
                   <input
-                    className="mt-1 p-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50"
                     type="text"
-                    placeholder="Age in months"
                     value={age}
                     onChange={handleEditAge}
-                    required
+                    className="w-full border border-gray-300 p-2 rounded-md"
                   />
-                </label>
-                <div className="col-span-2">
-                  <span className="text-gray-700">Medical History:</span>
-                  <div className="mt-2 space-y-2">
-                    <label className="flex items-center">
-                      <input
-                        type="checkbox"
-                        className="rounded border-gray-300"
-                        value="vaccinated"
-                        checked={medhistory.includes("vaccinated")}
-                        onChange={handleEditMedHistory}
-                      />
-                      <span className="ml-2">Vaccinated</span>
-                    </label>
-                    <label className="flex items-center">
-                      <input
-                        type="checkbox"
-                        className="rounded border-gray-300"
-                        value="dewormed"
-                        checked={medhistory.includes("dewormed")}
-                        onChange={handleEditMedHistory}
-                      />
-                      <span className="ml-2">Dewormed</span>
-                    </label>
-                    <label className="flex items-center">
-                      <input
-                        type="checkbox"
-                        className="rounded border-gray-300"
-                        value="neutered"
-                        checked={medhistory.includes("neutered")}
-                        onChange={handleEditMedHistory}
-                      />
-                      <span className="ml-2">Neutered</span>
-                    </label>
-                  </div>
                 </div>
-                <label className="block">
-                  <span className="text-gray-700">Others:</span>
+                <div>
+                  <label className="block mb-1 font-medium text-gray-700">
+                    Medical History:
+                  </label>
+                  <select
+                    value={medhistory}
+                    onChange={handleEditMedHistory}
+                    multiple
+                    className="w-full border border-gray-300 p-2 rounded-md"
+                  >
+                    <option value="vaccinated">Vaccinated</option>
+                    <option value="dewormed">Dewormed</option>
+                    <option value="parasite-free">Parasite Free</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block mb-1 font-medium text-gray-700">
+                    Species:
+                  </label>
                   <input
-                    className="mt-1 p-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50"
                     type="text"
-                    placeholder="Please specify"
+                    value={species}
+                    onChange={handleEditSpecies}
+                    className="w-full border border-gray-300 p-2 rounded-md"
+                  />
+                </div>
+                <div>
+                  <label className="block mb-1 font-medium text-gray-700">
+                    Additional Information:
+                  </label>
+                  <textarea
                     value={others}
                     onChange={handleEditOthers}
-                  />
-                </label>
+                    className="w-full border border-gray-300 p-2 rounded-md"
+                  ></textarea>
+                </div>
               </div>
-
               <div className="mt-6 flex justify-end">
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 focus:outline-none focus:ring focus:ring-green-500 focus:ring-opacity-50"
+                  className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition duration-300"
                 >
-                  Add to Gallery
+                  {editMode ? "Update Pet" : "Add Pet"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+          {userGalleryData.map((pet, index) => (
+            <div key={index} className="bg-white p-4 rounded-lg shadow-md">
+              {pet.imageUrls.map((url, urlIndex) => (
+                <img
+                alt={pet.caption}
+                src={`http://localhost:8000/uploads/${pet.imageUrls[0]}`}
+                className="w-full h-48 object-cover rounded-lg"
+              />
+              ))}
+              <h3 className="text-lg font-semibold mb-2">{pet.caption}</h3>
+              <p className="mb-1">
+                <span className="font-medium">Breed:</span> {pet.breed}
+              </p>
+              <p className="mb-1">
+                <span className="font-medium">Gender:</span> {pet.gender}
+              </p>
+              <p className="mb-1">
+                <span className="font-medium">Age:</span> {pet.age}
+              </p>
+              <p className="mb-1">
+                <span className="font-medium">Medical History:</span>{" "}
+                {pet.medhistory.join(", ")}
+              </p>
+              <p className="mb-1">
+                <span className="font-medium">Species:</span> {pet.species}
+              </p>
+              <p className="mb-1">
+                <span className="font-medium">Additional Info:</span> {pet.others}
+              </p>
+              <p className="mb-1">
+                <span className="font-medium">Posted by:</span> {userInfo[pet.user_id]?.email}
+              </p>
+              <p className="mb-1">
+                <span className="font-medium">Contact:</span> {userInfo[pet.user_id]?.contactinfo}
+              </p>
+              <p className="mb-1">
+                <span className="font-medium">Address:</span> {userInfo[pet.user_id]?.currentAddress}
+              </p>
+              <>
+              {(userId === pet.user_id || role === "admin") && (
+                <button
+                  onClick={() => handleDeletePet(pet._id)}
+                  className="mt-4 px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition duration-300"
+                >
+                  Delete Pet
+                </button> )}
+                 {(userId === pet.user_id || role === "admin") && (
+                  <button
+                    onClick={() => {
+                      handleEditPet(pet);
+                      
+                    }}
+                    className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition duration-300 ml-2"
+                  >
+                    Edit Pet
+                  </button>
+                )}
+
+                
+                <AdoptButton
+                    imageUrl={pet.imageUrls[0]}
+                    petId={pet._id}
+                    onAdoptionSubmitted={handleAdoptionSubmitted}
+                    verified={verified}
+                    petOwnerId={pet.user_id} // Pass the pet's owner ID as a prop
+                  />
+              </>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white p-6 rounded-lg shadow-md w-3/4 max-w-2xl">
+            <h3 className="text-lg font-semibold mb-4">Edit Pet Information</h3>
+            <form onSubmit={handleAddToGallery}>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block mb-1 font-medium text-gray-700">
+                    Image:
+                  </label>
+                  <input
+                    type="file"
+                    onChange={handleFileChange}
+                    multiple
+                    className="w-full"
+                  />
+                </div>
+                <div>
+                  <label className="block mb-1 font-medium text-gray-700">
+                    Pet's Name:
+                  </label>
+                  <input
+                    type="text"
+                    value={caption}
+                    onChange={handleEditCaption}
+                    className="w-full border border-gray-300 p-2 rounded-md"
+                  />
+                </div>
+                <div>
+                  <label className="block mb-1 font-medium text-gray-700">
+                    Breed:
+                  </label>
+                  <input
+                    type="text"
+                    value={breed}
+                    onChange={handleEditBreed}
+                    className="w-full border border-gray-300 p-2 rounded-md"
+                  />
+                </div>
+                <div>
+                  <label className="block mb-1 font-medium text-gray-700">
+                    Gender:
+                  </label>
+                  <select
+                    value={gender}
+                    onChange={handleEditGender}
+                    className="w-full border border-gray-300 p-2 rounded-md"
+                  >
+                    <option value="">Select Gender</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block mb-1 font-medium text-gray-700">
+                    Age:
+                  </label>
+                  <input
+                    type="text"
+                    value={age}
+                    onChange={handleEditAge}
+                    className="w-full border border-gray-300 p-2 rounded-md"
+                  />
+                </div>
+                <div>
+                  <label className="block mb-1 font-medium text-gray-700">
+                    Medical History:
+                  </label>
+                  <select
+                    value={medhistory}
+                    onChange={handleEditMedHistory}
+                    multiple
+                    className="w-full border border-gray-300 p-2 rounded-md"
+                  >
+                    <option value="vaccinated">Vaccinated</option>
+                    <option value="dewormed">Dewormed</option>
+                    <option value="parasite-free">Parasite Free</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block mb-1 font-medium text-gray-700">
+                    Species:
+                  </label>
+                  <input
+                    type="text"
+                    value={species}
+                    onChange={handleEditSpecies}
+                    className="w-full border border-gray-300 p-2 rounded-md"
+                  />
+                </div>
+                <div>
+                  <label className="block mb-1 font-medium text-gray-700">
+                    Additional Information:
+                  </label>
+                  <textarea
+                    value={others}
+                    onChange={handleEditOthers}
+                    className="w-full border border-gray-300 p-2 rounded-md"
+                  ></textarea>
+                </div>
+              </div>
+              <div className="mt-6 flex justify-end">
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition duration-300"
+                >
+                  Update Pet
                 </button>
                 <button
                   type="button"
-                  onClick={() => setIsFormVisible(false)}
-                  className="ml-4 px-4 py-2 bg-gray-400 text-white rounded-md hover:bg-gray-500 focus:outline-none focus:ring focus:ring-gray-400 focus:ring-opacity-50"
+                  onClick={closeEditModal}
+                  className="ml-4 px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition duration-300"
                 >
                   Cancel
                 </button>
@@ -355,78 +568,6 @@ function FriendNeedsHome() {
           </div>
         </div>
       )}
-      <div className="mt-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {usergalleryData.map((item) => (
-            <div key={item._id} className="bg-white rounded-lg shadow-md p-4">
-              <img
-                alt={item.caption}
-                src={`http://localhost:8000/uploads/${item.imageUrls[0]}`}
-                className="w-full h-48 object-cover rounded-lg"
-              />
-              <div className="mt-4">
-                <p className="text-xs text-left">
-                  <strong>Pet#:</strong>{" "}
-                  <span className="text-xs font-medium text-green-400">
-                    {item._id}
-                  </span>
-                </p>
-                <p className="text-xs text-left">
-                  <strong>Posted by:</strong>{" "}
-                  <span className="text-xs font-medium text-green-400">
-                    {item.user_id}
-                  </span>
-                </p>
-                <p className="text-sm text-gray-600 m-3">"{item.caption}"</p>
-                <p className="text-sm text-gray-600">
-                  <span style={{ fontWeight: "bold" }}>Species:</span>{" "}
-                  {item.species}
-                </p>
-                <p className="text-sm text-gray-600">
-                  <span style={{ fontWeight: "bold" }}>Breed:</span>{" "}
-                  {item.breed}
-                </p>
-                <p className="text-sm text-gray-600">
-                  <span style={{ fontWeight: "bold" }}>Gender:</span>{" "}
-                  {item.gender}
-                </p>
-                <p className="text-sm text-gray-600">
-                  <span style={{ fontWeight: "bold" }}>Age:</span> {item.age}{" "}
-                  months old
-                </p>
-                <p className="text-sm text-gray-600">
-                  <span style={{ fontWeight: "bold" }}>Medical History:</span>{" "}
-                  {item.medhistory.length > 0 ? (
-                    <>
-                      {item.medhistory.join(", ")}
-                      {item.others ? `, ${item.others}` : ""}
-                    </>
-                  ) : (
-                    item.others
-                  )}
-                </p>
-                <div className="flex justify-between items-center mt-4">
-                  <AdoptButton
-                    imageUrl={item.imageUrls[0]}
-                    petId={item._id}
-                    onAdoptionSubmitted={handleAdoptionSubmitted}
-                    verified={verified}
-                    petOwnerId={item.user_id} // Pass the pet's owner ID as a prop
-                  />
-                  {(userId === item.user_id || role === "admin") && (
-                    <button
-                      onClick={() => handleDeletePet(item._id)}
-                      className="ml-4 px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 focus:outline-none focus:ring focus:ring-red-500 focus:ring-opacity-50"
-                    >
-                      Delete
-                    </button>
-                  )}
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
     </div>
   );
 }
