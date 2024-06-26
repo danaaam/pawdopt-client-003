@@ -6,6 +6,7 @@ import AdoptButton from "./AdoptButton";
 import { toast } from "react-toastify";
 import EditPetModal from "./EditPetModal";
 
+
 function FriendNeedsHome() {
   const [selectedImage, setSelectedImage] = useState(null);
   const [isFormVisible, setIsFormVisible] = useState(false);
@@ -19,6 +20,9 @@ function FriendNeedsHome() {
   const [editPetId, setEditPetId] = useState(null);
   const [editPet, setEditPet] = useState(null); // State for the pet being edited
   const [userInfo, setUserInfo] = useState({});
+  const [errorMessageCaption, setErrorMessageCaption] = useState('');
+  const [errorMessageBreed, setErrorMessageBreed] = useState('');
+
 
   // State variables for form fields
   const [caption, setCaption] = useState("");
@@ -29,29 +33,52 @@ function FriendNeedsHome() {
   const [species, setSpecies] = useState("");
   const [others, setOthers] = useState("");
 
+
   const handleEditCaption = (event) => {
-    setCaption(event.target.value);
+    const value = event.target.value;
+    if (value.length > 30) {
+      setErrorMessageCaption('Character limit exceeded. Maximum length is 30 characters.');
+    } else if (value.length < 3 && value.length > 0) {
+      setErrorMessageCaption('Minimum length is 3 characters.');
+      setCaption(value);
+    } else {
+      setErrorMessageCaption('');
+      setCaption(value);
+    }
   };
+
 
   const handleEditBreed = (event) => {
-    setBreed(event.target.value);
+    const value = event.target.value;
+    if (value.length > 30) {
+      setErrorMessageBreed('Character limit exceeded. Maximum length is 30 characters.');
+    } else if (value.length < 3 && value.length > 0) {
+      setErrorMessageBreed('Minimum length is 3 characters.');
+      setBreed(value);
+    } else {
+      setErrorMessageBreed('');
+      setBreed(value);
+    }
   };
-
   const handleEditGender = (event) => {
     setGender(event.target.value);
   };
+
 
   const handleEditAge = (event) => {
     setAge(event.target.value);
   };
 
+
   const handleEditSpecies = (event) => {
     setSpecies(event.target.value);
   };
 
+
   const handleEditOthers = (event) => {
     setOthers(event.target.value);
   };
+
 
   const handleEditMedHistory = (event) => {
     const { value } = event.target;
@@ -61,6 +88,7 @@ function FriendNeedsHome() {
       setMedHistory([...medhistory, value]);
     }
   };
+
 
   const handleButtonClick = () => {
     const isLoggedIn = localStorage.getItem("token");
@@ -72,22 +100,27 @@ function FriendNeedsHome() {
     }
   };
 
+
   const handleFileChange = (event) => {
     const selectedFiles = Array.from(event.target.files);
     setSelectedImage(selectedFiles);
   };
 
+
   const handleAddToGallery = async (event) => {
     event.preventDefault();
 
+
     try {
       const token = localStorage.getItem("token");
+
 
       if (!token) {
         toast.error("You need to log in first, please log in");
         navigate("/signin");
         return;
       }
+
 
       if (
         !selectedImage ||
@@ -101,6 +134,7 @@ function FriendNeedsHome() {
         return;
       }
 
+
       const formData = new FormData();
       selectedImage.forEach((file) => formData.append("images", file));
       formData.append("caption", caption);
@@ -110,6 +144,7 @@ function FriendNeedsHome() {
       formData.append("species", species);
       formData.append("medhistory", medhistory.join(", "));
       formData.append("others", others);
+
 
       if (editMode && editPetId) {
         await axios.put(
@@ -131,10 +166,12 @@ function FriendNeedsHome() {
           },
         });
 
+
         toast.success("Image uploaded successfully");
       }
       setFormSubmitted(true);
       setIsFormVisible(false);
+
 
       window.location.reload();
     } catch (error) {
@@ -143,9 +180,11 @@ function FriendNeedsHome() {
     }
   };
 
+
   const handleDeletePet = async (petId) => {
     try {
       const token = localStorage.getItem("token");
+
 
       if (!token) {
         toast.error("You need to log in first, please log in");
@@ -153,11 +192,13 @@ function FriendNeedsHome() {
         return;
       }
 
+
       await axios.delete(`http://localhost:8000/api/user/gallery/${petId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
+
 
       toast.success("Pet deleted successfully");
       setUpdateCount(updateCount + 1);
@@ -167,18 +208,53 @@ function FriendNeedsHome() {
     }
   };
 
+
   const handleEditPet = (pet) => {
     setEditPet(pet);
     setIsModalOpen(true);
   };
 
+
   const closeEditModal = () => {
     setIsModalOpen(false);
   };
 
-  const updateGallery = () => {
-    setUpdateCount(updateCount + 1);
-  };
+
+  const updateGallery = async (userId) => {
+
+
+    try {
+        const token = localStorage.getItem("token");
+        const response = await fetch(`http://localhost:8000/api/user/gallery/edit/${userId}`, {
+            method: 'PUT',
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+                breed,
+                caption,
+                gender,
+                age,
+                medhistory,
+                others,
+                species,
+            }),
+        });
+
+
+        if (!response.ok) {
+            throw new Error('Failed to update gallery item');
+        }
+
+
+        const data = await response.json();
+        console.log(data); // Handle success response
+    } catch (error) {
+        console.error('Error updating gallery item:', error.message);
+        // Handle error
+    }
+};
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -200,9 +276,11 @@ function FriendNeedsHome() {
       }
     };
 
+
     fetchData();
     handleSetVerified();
   }, [updateCount, formSubmitted]);
+
 
   const handleSetVerified = () => {
     const isVerified = localStorage.getItem("verified");
@@ -214,13 +292,16 @@ function FriendNeedsHome() {
     }
   };
 
+
   const handleAdoptionSubmitted = () => {
     setFormSubmitted(true);
   };
 
+
   const userId = localStorage.getItem("id");
   const role = localStorage.getItem("role");
   const firstname = localStorage.getItem("firstname");
+
 
   useEffect(() => {
     const fetchUserInfo = async () => {
@@ -237,6 +318,7 @@ function FriendNeedsHome() {
     };
     fetchUserInfo();
   }, []);
+
 
   return (
     <div className="bg-gray-100 min-h-screen py-8">
@@ -277,7 +359,7 @@ function FriendNeedsHome() {
                     className="w-full"
                   />
                 </div>
-                <div>
+                  <div>
                   <label className="block mb-1 font-medium text-gray-700">
                     Pet's Name:
                   </label>
@@ -287,6 +369,9 @@ function FriendNeedsHome() {
                     onChange={handleEditCaption}
                     className="w-full border border-gray-300 p-2 rounded-md"
                   />
+                  {errorMessageCaption && (
+                    <p className="text-red-500 mt-1">{errorMessageCaption}</p>
+                  )}
                 </div>
                 <div>
                   <label className="block mb-1 font-medium text-gray-700">
@@ -299,6 +384,9 @@ function FriendNeedsHome() {
                     className="w-full border border-gray-300 p-2 rounded-md"
                   />
                 </div>
+                {errorMessageBreed && (
+                    <p className="text-red-500 mt-1">{errorMessageBreed}</p>
+                  )}
                 <div>
                   <label className="block mb-1 font-medium text-gray-700">
                     Gender:
@@ -325,21 +413,50 @@ function FriendNeedsHome() {
                   />
                 </div>
                 <div>
-                  <label className="block mb-1 font-medium text-gray-700">
-                    Medical History:
-                  </label>
-                  <select
-                    value={medhistory}
-                    onChange={handleEditMedHistory}
-                    multiple
-                    className="w-full border border-gray-300 p-2 rounded-md"
-                  >
-                    <option value="vaccinated">Vaccinated</option>
-                    <option value="dewormed">Dewormed</option>
-                    <option value="parasite-free">Parasite Free</option>
-                  </select>
+                <label className="block mb-1 font-medium text-gray-700">
+                  Medical History:
+                </label>
+                <div className="w-full border border-gray-300 p-4 rounded-md space-y-2">
+                  <div className="flex items-center">
+                    <input
+                      type="checkbox"
+                      id="vaccinated"
+                      name="vaccinated"
+                      checked={medhistory.vaccinated}
+                      onChange={handleEditMedHistory}
+                      className="h-5 w-5 text-indigo-600 form-checkbox"
+                    />
+                    <label htmlFor="vaccinated" className="ml-2 text-gray-700">
+                      Vaccinated
+                    </label>
+                  </div>
+                  <div className="flex items-center">
+                    <input
+                      type="checkbox"
+                      id="dewormed"
+                      name="dewormed"
+                      checked={medhistory.dewormed}
+                      onChange={handleEditMedHistory}
+                      className="h-5 w-5 text-indigo-600 form-checkbox"
+                    />
+                    <label htmlFor="dewormed" className="ml-2 text-gray-700">
+                      Dewormed
+                    </label>
+                  </div>
+                  <div className="flex items-center">
+                    <input
+                      type="checkbox"
+                      id="parasiteFree"
+                      name="parasiteFree"
+                      checked={medhistory.parasiteFree}
+                      onChange={handleEditMedHistory}
+                      className="h-5 w-5 text-indigo-600 form-checkbox"
+                    />
+                    <label htmlFor="parasiteFree" className="ml-2 text-gray-700">
+                      Parasite Free
+                    </label>
+                  </div>
                 </div>
-                <div>
                   <label className="block mb-1 font-medium text-gray-700">
                     Species:
                   </label>
@@ -373,6 +490,7 @@ function FriendNeedsHome() {
           </div>
         </div>
       )}
+
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
@@ -409,11 +527,17 @@ function FriendNeedsHome() {
                 <span className="font-medium">Posted by:</span> {userInfo[pet.user_id]?.email}
               </p>
               <p className="mb-1">
-                <span className="font-medium">Contact:</span> {userInfo[pet.user_id]?.contactinfo}
+                <span className="font-small">Contact:</span> {userInfo[pet.user_id]?.contactinfo}
               </p>
               <p className="mb-1">
-                <span className="font-medium">Address:</span> {userInfo[pet.user_id]?.currentAddress}
+                <span className="font-medium">Facebook:</span>
+                <br />
+                <a href={userInfo[pet.user_id]?.facebook} target="_blank" rel="noopener noreferrer">
+                  {userInfo[pet.user_id]?.facebook}
+                </a>
               </p>
+
+
               <>
               {(userId === pet.user_id || role === "admin") && (
                 <button
@@ -426,7 +550,7 @@ function FriendNeedsHome() {
                   <button
                     onClick={() => {
                       handleEditPet(pet);
-                      
+                     
                     }}
                     className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition duration-300 ml-2"
                   >
@@ -434,7 +558,8 @@ function FriendNeedsHome() {
                   </button>
                 )}
 
-                
+
+               
                 <AdoptButton
                     imageUrl={pet.imageUrls[0]}
                     petId={pet._id}
@@ -448,23 +573,13 @@ function FriendNeedsHome() {
         </div>
       </div>
 
+
       {isModalOpen && (
         <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center">
           <div className="bg-white p-6 rounded-lg shadow-md w-3/4 max-w-2xl">
             <h3 className="text-lg font-semibold mb-4">Edit Pet Information</h3>
-            <form onSubmit={handleAddToGallery}>
+            <form onSubmit={updateGallery}>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block mb-1 font-medium text-gray-700">
-                    Image:
-                  </label>
-                  <input
-                    type="file"
-                    onChange={handleFileChange}
-                    multiple
-                    className="w-full"
-                  />
-                </div>
                 <div>
                   <label className="block mb-1 font-medium text-gray-700">
                     Pet's Name:
@@ -513,21 +628,72 @@ function FriendNeedsHome() {
                   />
                 </div>
                 <div>
-                  <label className="block mb-1 font-medium text-gray-700">
-                    Medical History:
-                  </label>
-                  <select
-                    value={medhistory}
-                    onChange={handleEditMedHistory}
-                    multiple
-                    className="w-full border border-gray-300 p-2 rounded-md"
-                  >
-                    <option value="vaccinated">Vaccinated</option>
-                    <option value="dewormed">Dewormed</option>
-                    <option value="parasite-free">Parasite Free</option>
-                  </select>
+              <label className="block mb-1 font-medium text-gray-700">
+                Age:
+              </label>
+              <input
+                type="text"
+                value={age}
+                onChange={handleEditAge}
+                className="w-full border border-gray-300 p-2 rounded-md"
+              />
+            </div>
+            <div>
+                <label className="block mb-1 font-medium text-gray-700">
+                  Age:
+                </label>
+                <input
+                  type="text"
+                  value={age}
+                  onChange={handleEditAge}
+                  className="w-full border border-gray-300 p-2 rounded-md"
+                />
+              </div>
+              <div>
+                <label className="block mb-1 font-medium text-gray-700">
+                  Medical History:
+                </label>
+                <div className="w-full border border-gray-300 p-4 rounded-md space-y-2">
+                  <div className="flex items-center">
+                    <input
+                      type="checkbox"
+                      id="vaccinated"
+                      name="vaccinated"
+                      checked={medhistory.vaccinated}
+                      onChange={handleEditMedHistory}
+                      className="h-5 w-5 text-indigo-600 form-checkbox"
+                    />
+                    <label htmlFor="vaccinated" className="ml-2 text-gray-700">
+                      Vaccinated
+                    </label>
+                  </div>
+                  <div className="flex items-center">
+                    <input
+                      type="checkbox"
+                      id="dewormed"
+                      name="dewormed"
+                      checked={medhistory.dewormed}
+                      onChange={handleEditMedHistory}
+                      className="h-5 w-5 text-indigo-600 form-checkbox"
+                    />
+                    <label htmlFor="dewormed" className="ml-2 text-gray-700">
+                      Dewormed
+                    </label>
+                  </div>
+                  <div className="flex items-center">
+                    <input
+                      type="checkbox"
+                      id="parasiteFree"
+                      name="parasiteFree"
+                      checked={medhistory.parasiteFree}
+                      onChange={handleEditMedHistory}
+                      className="h-5 w-5 text-indigo-600 form-checkbox"
+                    />
+                    <label htmlFor="parasiteFree" className="ml-2 text-gray-700">
+                      Parasite Free
+                    </label>
+                  </div>
                 </div>
-                <div>
                   <label className="block mb-1 font-medium text-gray-700">
                     Species:
                   </label>
@@ -572,4 +738,6 @@ function FriendNeedsHome() {
   );
 }
 
+
 export default FriendNeedsHome;
+

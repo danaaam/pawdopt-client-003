@@ -11,9 +11,11 @@ const Signup = () => {
   const [lastname, setLastname] = useState("");
   const [middlename, setMiddlename] = useState("");
   const [suffix, setSuffix] = useState("");
+  const [error, setError] = useState('');
   const [email, setEmail] = useState("");
   const [facebook, setFacebook] =useState("");
-  const [contactinfo, setContactinfo] = useState("+63 ");
+  const [contactinfo, setContactinfo] = useState("");
+  const [country, setCountry] = useState('');
   const [currentAddress, setCurrentAddress] = useState("");
   const [permanentAddress, setPermanentAddress] = useState("");
   const [password, setPassword] = useState("");
@@ -22,8 +24,35 @@ const Signup = () => {
   const [validDocs, setValidDocs] = useState(null); // Renamed state variable
   const fileInputRef = useRef(null); // Ref for file input element
   const [isAgreed, setIsAgreed] = useState(false);
+  const [showTermsModal, setShowTermsModal] = useState(false);
+  const countryDialCodes = {
+    PH: '+63',
+    USA: '+1',
+    CA: '+1', 
+    GB: '+44', 
+    AU: '+61', 
+    JP: '+81', 
+    DE: '+49', 
+    FR: '+33', 
+    IT: '+39', 
+    IN: '+91'  
+};
 
   const navigate = useNavigate();
+
+  
+  
+  const validSuffixPattern = /^(Jr\.|Sr\.|I{1,3}|IV|V|VI|VII|VIII|IX|X|XI|XII|XIII|XIIII|XV|XVI|XVII|XVIII|XIX|XX)$/;
+
+  const handleChange = (e) => {
+    const value = e.target.value;
+    if (validSuffixPattern.test(value) || value === '') {
+      setSuffix(value);
+      setError('');
+    } else {
+      setError('Invalid suffix. Please enter "Jr.", "Sr.", or a Roman numeral (I, II, III, IV, V).');
+    }
+  };
 
   const handleSubmit = async () => {
     try {
@@ -57,13 +86,6 @@ const Signup = () => {
   };
   
 
-  const handleContactInfoChange = (e) => {
-    let value = e.target.value;
-    if (!value.startsWith("+63")) {
-      value = "+63" + value.replace(/^\+/, "");
-    }
-    setContactinfo(value);
-  };
 
   const handleFileUpload = (e) => {
     const file = e.target.files[0];
@@ -98,6 +120,113 @@ const Signup = () => {
       <span className="text-red-500">&#10060;</span>
     );
   };
+
+
+  const copyPermanentToCurrent = () => {
+    setCurrentAddress(permanentAddress);
+  };
+
+  const toggleTermsModal = () => {
+    setShowTermsModal(!showTermsModal);
+  };
+
+
+  
+ 
+  const validationRules = {
+    PH: {
+      regex: /^9\d{0,9}$/,
+      maxLength: 10
+    },
+    USA: {
+      regex: /^\d{10}$/,
+      maxLength: 10
+    },
+    CA: {
+      regex: /^\d{10}$/,
+      maxLength: 10
+    },
+    GB: {
+      regex: /^\d{10}$/, 
+      maxLength: 10
+    },
+    AU: {
+      regex: /^\d{9}$/,
+      maxLength: 9
+    },
+    JP: {
+      regex: /^\d{10}$/, 
+      maxLength: 10
+    },
+    DE: {
+      regex: /^\d{10}$/,
+      maxLength: 10
+    },
+    FR: {
+      regex: /^\d{9}$/, 
+      maxLength: 9
+    },
+    IT: {
+      regex: /^\d{10}$/, 
+      maxLength: 10
+    },
+    IN: {
+      regex: /^\d{10}$/,
+      maxLength: 10
+    }
+  };
+  
+  const handleCountryChange = (e) => {
+    const selectedCountry = e.target.value;
+    setCountry(selectedCountry);
+    setContactinfo(countryDialCodes[selectedCountry] || '');
+  };
+  
+  const handleContactInfoChange = (e) => {
+    let value = e.target.value;
+  
+    // Filter out non-numeric characters except for the '+'
+    value = value.replace(/[^\d+]/g, '');
+  
+    // Get the selected country
+    const selectedCountry = country;
+  
+    // Get the validation rule for the selected country
+    const validationRule = validationRules[selectedCountry];
+  
+    // Apply validation rules if they exist for the selected country
+    if (validationRule) {
+      const { maxLength } = validationRule;
+      const countryCode = countryDialCodes[selectedCountry];
+  
+      // Remove country code from the value for validation
+      if (value.startsWith(countryCode)) {
+        value = value.slice(countryCode.length);
+      } else {
+        value = '';
+      }
+  
+      // For the Philippines, ensure the first digit is always 9
+      if (selectedCountry === 'PH') {
+        if (value[0] !== '9') {
+          value = '9' + value;
+        }
+        // Limit to maxLength characters
+        value = value.slice(0, maxLength);
+      } else {
+        // Limit to maxLength characters
+        value = value.slice(0, maxLength);
+      }
+  
+      // Add the country code back to the value
+      value = countryCode + value;
+    }
+  
+    // Set the contactinfo state to the filtered value
+    setContactinfo(value);
+  };
+  
+  
 
   return (
     <div>
@@ -180,36 +309,35 @@ const Signup = () => {
                     </div>
                   </div>
                   {/* Suffix */}
-                <div className=" px-3 mb-5">
-                  <label htmlFor="suffix" className="text-xs font-semibold px-1">
-                    Suffix
-                  </label>
-                  <div className="flex">
-                    <div className="w-10 z-10 pl-1 text-center pointer-events-none flex items-center justify-center">
-                      <i className="mdi mdi-account-outline text-gray-400 text-lg" />
-                    </div>
-                    {/* Dropdown selection */}
-                    <select
-                      id="suffix"
-                      name="suffix"
-                      onChange={(e) => setSuffix(e.target.value)}
-                      value={suffix}
-                      required
-                      className="w-full -ml-10 pl-10 pr-3 py-2 rounded-lg border-2 border-gray-200 outline-none focus:border-[#6dbb48]"
-                    >
-                      {/* Placeholder option */}
-                      <option value="">Select</option>
-                      {/* Options for suffixes */}
-                      <option value="Jr.">Jr.</option>
-                      <option value="Sr.">Sr.</option>
-                      <option value="II">II</option>
-                      <option value="III">III</option>
-                      <option value="IV">IV</option>
-                      {/* Add more options as needed */}
-                    </select>
+                <div className="px-3 mb-5">
+                <label htmlFor="suffix" className="text-xs font-semibold px-1">
+                  Suffix
+                </label>
+                <div className="flex">
+                  <div className="w-10 z-10 pl-1 text-center pointer-events-none flex items-center justify-center">
+                    <i className="mdi mdi-account-outline text-gray-400 text-lg" />
                   </div>
+                  <input
+                    id="suffix"
+                    name="suffix"
+                    list="suffix-suggestions"
+                    placeholder="Suffix"
+                    onChange={handleChange}
+                    value={suffix}
+                    className="w-full -ml-10 pl-10 pr-3 py-2 rounded-lg border-2 border-gray-200 outline-none focus:border-[#6dbb48]"
+                  />
+                  <datalist id="suffix-suggestions">
+                    <option value="Jr." />
+                    <option value="Sr." />
+                    <option value="I" />
+                    <option value="II" />
+                    <option value="III" />
+                    <option value="IV" />
+                    <option value="V" />
+                  </datalist>
                 </div>
-
+                {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
+              </div>
                 </div>
                 {/* Email */}
                 <div className="flex -mx-3">
@@ -235,26 +363,42 @@ const Signup = () => {
                 </div>
                 {/* Contact Info */}
                 <div className="flex -mx-3">
-                  <div className="w-full px-3 mb-5">
-                    <label htmlFor="contactInfo" className="text-xs font-semibold px-1">
-                      Contact Number<span className="text-red-400 font-extrabold">*</span>
-                    </label>
-                    <div className="flex">
-                      <div className="w-10 z-10 pl-1 text-center pointer-events-none flex items-center justify-center">
-                        <i className="mdi mdi-phone-outline text-gray-400 text-lg" />
-                      </div>
-                      <input
-                        type="text"
-                        placeholder="9000000000"
-                        name="contactInfo"
-                        onChange={handleContactInfoChange}
-                        value={contactinfo}
-                        required
-                        className="w-full -ml-10 pl-10 pr-3 py-2 rounded-lg border-2 border-gray-200 outline-none focus:border-[#6dbb48]"
-                      />
-                    </div>
-                  </div>
+        <div className="w-full px-3 mb-5">
+          <label htmlFor="contactInfo" className="text-xs font-semibold px-1">
+            Contact Number<span className="text-red-400 font-extrabold">*</span>
+          </label>
+          <div className="flex">
+            {/* Country selector */}
+            <select
+            onChange={handleCountryChange}
+            value={country}
+            className="rounded-l-lg border-t mr-0 border-b border-l text-gray-800 border-gray-200 bg-white pl-2 pr-6"
+            style={{ width: '160px' }} // Adjust width in pixels as needed
+          >
+             <option value="">Select Country</option>
+            <option value="PH">PHILIPPINES (+63)</option>
+            <option value="USA">USA (+1)</option>
+            <option value="GB">UNITED KINGDOM (+44)</option>
+            <option value="AU">AUSTRILIA (+61)</option>
+            <option value="JP">JAPAN (+81)</option>
+            <option value="DE">GERMANY (+49)</option>
+            <option value="FR">FRANCE (+33)</option>
+            <option value="IT">ITALY (+39)</option>
+            <option value="IN">INDIA (+91)</option>
+          </select>
+            {/* Phone number input */}
+            <input
+                type="text"
+                placeholder="Contact Number"
+                name="contactInfo"
+                onChange={handleContactInfoChange}
+                value={contactinfo}
+                required
+                className="w-40 pl-2 pr-3 py-2 rounded-lg border-2 border-gray-200 outline-none focus:border-[#6dbb48]"
+              />
                 </div>
+              </div>
+            </div>
                 {/* Facebook */}
                 <div className="flex -mx-3">
                   <div className="w-full px-3 mb-5">
@@ -266,7 +410,7 @@ const Signup = () => {
                         <i className="mdi mdi-email-outline text-gray-400 text-lg" />
                       </div>
                       <input
-                        type="text"
+                        type="tel"
                         placeholder="www.facebook.com/username"
                         name="facebook"
                         onChange={(e) => setFacebook(e.target.value)}
@@ -279,52 +423,68 @@ const Signup = () => {
                 </div>
                 {/* Permanent Address */}
                 <div className="flex -mx-3">
-                  <div className="w-full px-3 mb-5">
-                    <label htmlFor="address" className="text-xs font-semibold px-1">
-                      Permanent Address<span className="text-red-400 font-extrabold">*</span>
+                <div className="w-full px-3 mb-5">
+                    <label htmlFor="permanent-address" className="text-xs font-semibold px-1">
+                        Permanent Address<span className="text-red-400 font-extrabold">*</span>
                     </label>
                     <div className="flex">
-                      <div className="w-10 z-10 pl-1 text-center pointer-events-none flex items-center justify-center">
-                        <i className="mdi mdi-home-outline text-gray-400 text-lg" />
-                      </div>
-                      <input
-                        type="text"
-                        placeholder="House #/Street, Barangay, Town/City, Province"
-                        name="address"
-                        onChange={(e) => setPermanentAddress(e.target.value)}
-                        value={permanentAddress}
-                        required
-                        className="w-full -ml-10 pl-10 pr-3 py-2 rounded-lg border-2 border-gray-200 outline-none focus:border-[#6dbb48]"
-                      />
+                        <div className="w-10 z-10 pl-1 text-center pointer-events-none flex items-center justify-center">
+                            <i className="mdi mdi-home-outline text-gray-400 text-lg" />
+                        </div>
+                        <input
+                            type="text"
+                            id="permanent-address"
+                            placeholder="House #/Street, Barangay, Town/City, Province"
+                            name="permanent-address"
+                            onChange={(e) => setPermanentAddress(e.target.value)}
+                            value={permanentAddress}
+                            required
+                            className="w-full -ml-10 pl-10 pr-3 py-2 rounded-lg border-2 border-gray-200 outline-none focus:border-[#6dbb48]"
+                        />
                     </div>
                     {/* Hint text */}
                     <p className="text-sm text-slate-400"><i>*House #/Street, Barangay, Town/City, Province</i></p>
-                  </div>
                 </div>
-                {/* Permanent Address */}
-                <div className="flex -mx-3">
-                  <div className="w-full px-3 mb-5">
-                    <label htmlFor="address" className="text-xs font-semibold px-1">
-                      Current Address<span className="text-red-400 font-extrabold">*</span>
+            </div>
+
+            {/* Current Address */}
+            <div className="flex -mx-3">
+                <div className="w-full px-3 mb-5">
+                    <label htmlFor="current-address" className="text-xs font-semibold px-1">
+                        Current Address<span className="text-red-400 font-extrabold">*</span>
                     </label>
                     <div className="flex">
-                      <div className="w-10 z-10 pl-1 text-center pointer-events-none flex items-center justify-center">
-                        <i className="mdi mdi-home-outline text-gray-400 text-lg" />
-                      </div>
-                      <input
-                        type="text"
-                        placeholder="House #/Street, Barangay, Town/City, Province"
-                        name="address"
-                        onChange={(e) => setCurrentAddress(e.target.value)}
-                        value={currentAddress}
-                        required
-                        className="w-full -ml-10 pl-10 pr-3 py-2 rounded-lg border-2 border-gray-200 outline-none focus:border-[#6dbb48]"
-                      />
+                        <div className="w-10 z-10 pl-1 text-center pointer-events-none flex items-center justify-center">
+                            <i className="mdi mdi-home-outline text-gray-400 text-lg" />
+                        </div>
+                        <input
+                            type="text"
+                            id="current-address"
+                            placeholder="House #/Street, Barangay, Town/City, Province"
+                            name="current-address"
+                            onChange={(e) => setCurrentAddress(e.target.value)}
+                            value={currentAddress}
+                            required
+                            className="w-full -ml-10 pl-10 pr-3 py-2 rounded-lg border-2 border-gray-200 outline-none focus:border-[#6dbb48]"
+                        />
                     </div>
                     {/* Hint text */}
                     <p className="text-sm text-slate-400"><i>*House #/Street, Barangay, Town/City, Province</i></p>
-                  </div>
                 </div>
+            </div>
+
+            {/* Button to copy permanent address to current address */}
+            <div className="flex -mx-3">
+                <div className="w-full px-3">
+                    <button
+                        type="button"
+                        className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm"
+                        onClick={copyPermanentToCurrent}
+                    >
+                        Copy from Permanent Address
+                    </button>
+                </div>
+            </div>
                 {/* Password */}
                 <div className="flex -mx-3 relative mb-5">
                   <div className="w-full px-3">
@@ -337,7 +497,7 @@ const Signup = () => {
                       </div>
                       <input
                         type={showPassword ? "text" : "password"} // Conditional type based on showPassword state
-                        placeholder="***********"
+                        placeholder="Password"
                         name="password"
                         onChange={(e) => setPassword(e.target.value)}
                         value={password}
@@ -391,23 +551,57 @@ const Signup = () => {
                 </div>
                 {/* Terms & Conditions Checkbox */}
                 <div className="flex -mx-3 mb-5">
-                  <div className="w-full px-3">
-                    <label className="flex items-center text-xs font-semibold px-1">
-                      <input
-                        type="checkbox"
-                        className="form-checkbox cursor-pointer"
-                        checked={isAgreed}
-                        onChange={() => setIsAgreed(!isAgreed)}
-                      />
-                      <span className="ml-2">
-                        I agree to the{" "}
-                        <a href="/terms" target="_blank" className="text-[#6dbb48] underline text-sm">
-                          terms & conditions
-                        </a>
-                      </span>
-                    </label>
-                  </div>
-                </div>
+        <div className="w-full px-3">
+          <label className="flex items-center text-xs font-semibold px-1">
+            <input
+              type="checkbox"
+              className="form-checkbox cursor-pointer"
+              checked={isAgreed}
+              onChange={() => setIsAgreed(!isAgreed)}
+            />
+            <span className="ml-2">
+              I agree to the{" "}
+              <a
+                href="#"
+                className="text-[#6dbb48] underline text-sm cursor-pointer"
+                onClick={toggleTermsModal}
+              >
+                terms & conditions
+              </a>
+            </span>
+          </label>
+        </div>
+      </div>
+
+      {/* Modal for Terms & Conditions */}
+      {showTermsModal && (
+        <div className="fixed inset-0 flex items-center justify-center z-50">
+            <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
+            <h2 className="text-lg font-semibold mb-4">Terms & Conditions for Pet Adoption</h2>
+            <p className="text-sm text-gray-700">
+              By agreeing to these terms and conditions, you acknowledge that:
+              <br />
+              <br />
+              - The adoption process involves careful consideration and commitment.
+              <br />
+              - You are responsible for the well-being and care of the adopted pet.
+              <br />
+              - You agree to provide a loving and safe environment for the pet.
+              <br />
+              - Adoption fees and conditions may apply as per the organization's policy.
+              <br />
+            </p>
+            <div className="mt-4 text-right">
+              <button
+                className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
+                onClick={toggleTermsModal}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
                 <div className="flex -mx-3">
                   <div className="w-full px-3 mb-5">
                   <button
