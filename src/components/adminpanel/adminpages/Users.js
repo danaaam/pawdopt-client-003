@@ -5,15 +5,18 @@ import { FaEnvelope } from "react-icons/fa"; // Import email icon
 import Modal from "./Modal"; // Ensure you have the Modal component
 import "./adminpagescss/Users.css";
 
+
 function Users() {
   const [users, setUsers] = useState([]);
   const [viewingUser, setViewingUser] = useState(null);
   const [adminMessage, setAdminMessage] = useState(""); // Add this state if needed
   const roles = ["admin", "user"]; // Example roles
 
+
   useEffect(() => {
     fetchUsers();
   }, []);
+
 
   const fetchUsers = async () => {
     try {
@@ -25,13 +28,16 @@ function Users() {
     }
   };
 
+
   const handleViewMore = (user) => {
     setViewingUser(user);
   };
 
+
   const closeModal = () => {
     setViewingUser(null);
   };
+
 
   const handleToggleVerification = async (user, value) => {
     const updatedUser = { ...user, verified: value, adminMessage: adminMessage };
@@ -54,11 +60,13 @@ function Users() {
     }
   };
 
+
   const handleRoleChange = async (userId, newRole) => {
     try {
       console.log(`Updating user ${userId} role to ${newRole}`);
       const response = await axios.patch(`http://localhost:8000/api/edit/users/${userId}`, { role: newRole });
       console.log("Server response:", response.data);
+
 
       if (response.status === 200) {
         fetchUsers();
@@ -72,15 +80,23 @@ function Users() {
     }
   };
 
+
   const handleSendEmail = (email) => {
     window.open(`https://mail.google.com/mail/?view=cm&fs=1&tf=1&to=${email}`);
   };
+
 
   return (
     <div className="h-screen overflow-x-auto">
       <table className="min-w-full divide-y divide-gray-200">
         <thead className="bg-gray-50">
           <tr>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Email:
+            </th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Email Verified
+            </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Firstname
             </th>
@@ -101,6 +117,10 @@ function Users() {
         <tbody className="bg-white divide-y divide-gray-200">
           {users.map((user) => (
             <tr key={user._id}>
+              <td className="px-6 py-4 whitespace-nowrap">{user.email}</td>
+              <td className="px-6 py-4 whitespace-nowrap">
+                {user.isVerified ? "Yes" : "No"}
+              </td>
               <td className="px-6 py-4 whitespace-nowrap">{user.firstname}</td>
               <td className="px-6 py-4 whitespace-nowrap">{user.lastname}</td>
               <td className="px-6 py-4 whitespace-nowrap">
@@ -121,7 +141,6 @@ function Users() {
                   value={user.verified.toString()}
                   onChange={(e) => {
                     const newVerified = e.target.value === "true";
-                    console.log(`Selected value: ${e.target.value}, New verified: ${newVerified}`);
                     handleToggleVerification(user, newVerified);
                   }}
                   className="border border-gray-300 rounded-md"
@@ -147,11 +166,13 @@ function Users() {
         </tbody>
       </table>
 
+
       {viewingUser && (
         <Modal show={!!viewingUser} onClose={closeModal} user={viewingUser} fetchUsers={fetchUsers} />
       )}
     </div>
   );
 }
+
 
 export default Users;

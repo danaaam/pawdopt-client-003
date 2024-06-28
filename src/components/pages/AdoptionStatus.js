@@ -104,7 +104,7 @@ function AdoptionStatus() {
                                     <p className="text-left"><strong className='text-xs'>Contact Info:</strong> {request.contactInfo}</p>
                                     <p className="text-left"><strong className='text-xs'>Address:</strong> {request.address}</p>
                                     <p className="text-left"><strong className='text-xs'>Email:</strong> {request.email}</p>
-                                    <p className="text-left bg-slate-300 pt-0 pb-1 pl-1 pr-1"><strong className='text-xs'>Admin's Message:</strong><br/> {request.adminMessage}</p>
+                                    <p className="text-left bg-slate-300 pt-0 pb-1 pl-1 pr-1"><strong className='text-xs'>Admin's Message:</strong><br/> {request.adminMessage || 'Screening/Monitoring Wednesday, July 3 · 9:00 – 10:30am Video call link: https://meet.google.com/bct-nfwx-jsx'}</p>
                                     {request.status === 'pending' && (
                                         <button
                                         className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mt-4 float-left"

@@ -1,15 +1,25 @@
-// EditPetModal.js
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 const EditPetModal = ({ isOpen, onClose, onSave, pet }) => {
-  const [caption, setCaption] = useState(pet.caption);
-  const [breed, setBreed] = useState(pet.breed);
-  const [gender, setGender] = useState(pet.gender);
-  const [age, setAge] = useState(pet.age);
-  const [medhistory, setMedHistory] = useState(pet.medhistory.join(", "));
-  const [species, setSpecies] = useState(pet.species);
-  const [others, setOthers] = useState(pet.others);
+  const [caption, setCaption] = useState("");
+  const [breed, setBreed] = useState("");
+  const [gender, setGender] = useState("");
+  const [age, setAge] = useState("");
+  const [medhistory, setMedHistory] = useState("");
+  const [species, setSpecies] = useState("");
+  const [others, setOthers] = useState("");
+
+  useEffect(() => {
+    if (pet) {
+      setCaption(pet.caption || "");
+      setBreed(pet.breed || "");
+      setGender(pet.gender || "");
+      setAge(pet.age || "");
+      setMedHistory(pet.medhistory ? pet.medhistory.join(", ") : "");
+      setSpecies(pet.species || "");
+      setOthers(pet.others || "");
+    }
+  }, [pet]);
 
   const handleSave = (e) => {
     e.preventDefault();
@@ -26,8 +36,10 @@ const EditPetModal = ({ isOpen, onClose, onSave, pet }) => {
     onClose();
   };
 
+  if (!isOpen) return null;
+
   return (
-    <div className={`fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center ${isOpen ? '' : 'hidden'}`}>
+    <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center">
       <div className="bg-white p-6 rounded-lg shadow-md w-3/4 max-w-2xl">
         <h3 className="text-lg font-semibold mb-4">Edit Pet Information</h3>
         <form onSubmit={handleSave}>

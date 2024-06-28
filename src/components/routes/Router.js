@@ -20,17 +20,25 @@ import ValidityPage from "../links/ValidityPage.js";
 import AdoptionStatusPage from "../links/AdoptionStatusPage.js";
 import SendOtpPage from "../links/SendOtpPage";
 import SubmitOtpPage from "../links/SubmitOtpPage";
+import VerifyEmailPage from '../links/VerifyEmailPage.js'
 import UserProfileEditPage from "../links/UserProfileEditPage.js";
 import ArchivedPage from "../adminpanel/adminpages/adminpagescss/Links/ArchivedPage.js";
+import CheckVerificationStatusPage from "../links/CheckVerificationStatusPage.js";
+
+
 
 
 function Router() {
 
+
   const login = window.localStorage.getItem("isLoggedin");
+
 
   useEffect(() => {
     Aos.init();
   }, []);
+
+
 
 
   return (
@@ -54,6 +62,8 @@ function Router() {
         <Route path="upload" element={<GalleryPage />} />
         <Route path="users" element={<UserPage />} />
         <Route path="edit-profile" element={<UserProfileEditPage />} />
+        <Route path="verify-email" element={<VerifyEmailPage/>} />
+        <Route path="check-verification-email" element={<CheckVerificationStatusPage/>} />
         {/* <Route path="approval" element={<PendingPage />} /> */}
       </Routes>
       <ToastContainer
@@ -71,5 +81,6 @@ function Router() {
     </div>
   );
 }
+
 
 export default Router;

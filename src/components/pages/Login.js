@@ -112,7 +112,7 @@ const Login = () => {
         name="password"
         type={showPassword ? "text" : "password"} // Conditional type based on showPassword state
         autoComplete="current-password"
-        placeholder="************"
+        placeholder="Enter Password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
         required

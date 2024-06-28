@@ -3,7 +3,9 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { toast } from "react-toastify";
 import Zoom from 'react-medium-image-zoom';
+import { Link } from 'react-router-dom';
 import 'react-medium-image-zoom/dist/styles.css';
+
 
 function Validity() {
   const [verified, setVerified] = useState(false);
@@ -22,7 +24,9 @@ function Validity() {
   });
   const [file, setFile] = useState(null);
 
+
   const navigate = useNavigate();
+
 
   const fetchVerificationStatus = async () => {
     try {
@@ -41,6 +45,7 @@ function Validity() {
     }
   };
 
+
   const fetchUserProfile = async () => {
     try {
       const id = localStorage.getItem('id');
@@ -56,6 +61,7 @@ function Validity() {
       setError('Failed to fetch user profile.');
     }
   };
+
 
   const handleDeleteAccount = async () => {
     try {
@@ -76,6 +82,7 @@ function Validity() {
     }
   };
 
+
   const handleEdit = (field) => {
     setEditField(field);
     if (field === 'name') {
@@ -90,13 +97,14 @@ function Validity() {
     }
   };
 
+
   const handleSave = async (field) => {
     try {
       const id = localStorage.getItem('id');
       const token = localStorage.getItem('token');
       let updatedField = {};
       const formData = new FormData();
-      
+     
       if (field === 'name') {
         updatedField = editValues;
       } else if (field === 'validDocs' && file) {
@@ -104,7 +112,7 @@ function Validity() {
       } else {
         updatedField[field] = editValue;
       }
-      
+     
       if (field === 'validDocs' && file) {
         await axios.put(`http://localhost:8000/api/edit/user/${id}`, formData, {
           headers: {
@@ -120,6 +128,7 @@ function Validity() {
         });
       }
 
+
       setUser(prevState => ({
         ...prevState,
         ...updatedField
@@ -132,26 +141,32 @@ function Validity() {
     }
   };
 
+
   useEffect(() => {
     fetchVerificationStatus();
     fetchUserProfile();
   }, []);
 
+
   const openModal = () => {
     setShowModal(true);
   };
+
 
   const closeModal = () => {
     setShowModal(false);
   };
 
+
   const openViewImageModal = () => {
     setViewImageModal(true);
   };
 
+
   const closeViewImageModal = () => {
     setViewImageModal(false);
   };
+
 
   return (
     <div className="min-h-screen flex flex-col justify-center items-center bg-gray-100">
@@ -178,9 +193,11 @@ function Validity() {
           <p className="text-center text-gray-700 mb-4">Loading...</p>
         )}
 
+
         {user && (
           <div className="text-center">
             <h3 className="text-lg font-bold text-gray-800 mb-4">User Profile</h3>
+
 
             {/* User Profile Information */}
             <div className="mb-2 flex items-center justify-between">
@@ -240,6 +257,7 @@ function Validity() {
               </div>
             </div>
 
+
             <div className="mb-2 flex items-center justify-between">
               <span className="w-1/4 text-left">Email: </span>
               <div className="w-2/4">
@@ -254,7 +272,7 @@ function Validity() {
                   <span>{user.email}</span>
                 )}
               </div>
-              <div className="w-1/4 text-right">
+              {/* <div className="w-1/4 text-right">
                 {editField === 'email' ? (
                   <button
                     onClick={() => handleSave('email')}
@@ -264,16 +282,21 @@ function Validity() {
                   </button>
                 ) : (
                   <button
-                    disabled
                     onClick={() => handleEdit('email')}
                     className={`bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded ${verified !== null ? 'cursor-not-allowed' : ''}`}
                   >
                     Edit
                   </button>
                 )}
-              </div>
-            </div>
+              </div> */}
+              <Link to="/check-verification-email" className="w-1/4 text-right">
+                <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded">
+                Status
+              </button>
+              </Link>
 
+
+            </div>
             <div className="mb-2 flex items-center justify-between">
               <span className="w-1/4 text-left">Contact Number: </span>
               <div className="w-2/4">
@@ -306,6 +329,7 @@ function Validity() {
                 )}
               </div>
             </div>
+
 
             <div className="mb-2 flex items-center justify-between text-left">
               <span className="w-1/4">Permanent Address: </span>
@@ -341,6 +365,7 @@ function Validity() {
               </div>
             </div>
 
+
             <div className="mb-2 flex items-center justify-between text-left">
               <span className="w-1/4">Current Address: </span>
               <div className="w-2/4">
@@ -373,6 +398,7 @@ function Validity() {
                 )}
               </div>
             </div>
+
 
             {/* Document Section */}
             <div className="mb-2 flex items-center justify-between">
@@ -412,6 +438,7 @@ function Validity() {
               </div>
             </div>
 
+
             <div className="mb-2 flex items-center justify-between">
               <span className="w-1/4 text-left">Facebook: </span>
               <div className="w-2/4">
@@ -447,6 +474,7 @@ function Validity() {
               </div>
             </div>
 
+
             <div className="mt-4 flex justify-center">
               <button
                 className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mr-2"
@@ -458,6 +486,7 @@ function Validity() {
           </div>
         )}
       </div>
+
 
       {/* Modal for Delete Account Confirmation */}
       {showModal && (
@@ -479,12 +508,12 @@ function Validity() {
                   Cancel
                 </button>
                 <button
-                  className={`bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded ${verified == true ? 'cursor-not-allowed opacity-50' : ''}`}
+                  className={`bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded ${verified === true ? 'cursor-not-allowed opacity-50' : ''}`}
                   onClick={() => {
                     handleDeleteAccount();
                     closeModal();
                   }}
-                  disabled = {verified == true}
+                  disabled = {verified === true}
                 >
                   Delete
                 </button>
@@ -493,6 +522,7 @@ function Validity() {
           </div>
         </div>
       )}
+
 
       {/* Modal for Viewing Image */}
       {viewImageModal && (
@@ -524,4 +554,6 @@ function Validity() {
   );
 }
 
+
 export default Validity;
+
