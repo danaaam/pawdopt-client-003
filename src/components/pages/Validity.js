@@ -272,7 +272,7 @@ function Validity() {
                   <span>{user.email}</span>
                 )}
               </div>
-              {/* <div className="w-1/4 text-right">
+              <div className="w-1/4 text-right">
                 {editField === 'email' ? (
                   <button
                     onClick={() => handleSave('email')}
@@ -288,7 +288,7 @@ function Validity() {
                     Edit
                   </button>
                 )}
-              </div> */}
+              </div>
               <Link to="/check-verification-email" className="w-1/4 text-right">
                 <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded">
                 Status
