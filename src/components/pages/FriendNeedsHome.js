@@ -579,7 +579,7 @@ function FriendNeedsHome() {
 <p className="mb-1">
   <span className="font-medium">Facebook:</span>
   <br />
-  <a href={userInfo[pet.user_id]?.facebook} target="_blank" rel="noopener noreferrer">
+  <a href={`https://${userInfo[pet.user_id]?.facebook}`} target="_blank" rel="noopener noreferrer">
     {userInfo[pet.user_id]?.facebook}
   </a>
 </p>
